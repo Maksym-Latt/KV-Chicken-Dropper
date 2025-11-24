@@ -2,11 +2,14 @@ package com.chicken.dropper.ui.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.chicken.dropper.domain.model.ChickenSkin
+import com.chicken.dropper.domain.repository.PlayerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.random.Random
@@ -16,7 +19,9 @@ private const val SPEED_STEP = 0.08f
 private const val FALL_SPEED = 1.1f
 
 @HiltViewModel
-class GameViewModel @Inject constructor() : ViewModel() {
+class GameViewModel @Inject constructor(
+    private val playerRepository: PlayerRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GameUiState())
     val uiState: StateFlow<GameUiState> = _uiState
@@ -25,6 +30,7 @@ class GameViewModel @Inject constructor() : ViewModel() {
     private var hitsToSpeedUp = 5
 
     init {
+        observePlayer()
         startLoop()
     }
 
@@ -93,6 +99,7 @@ class GameViewModel @Inject constructor() : ViewModel() {
             val nextHitsLeft = if (hitsToSpeedUp > 1) hitsToSpeedUp - 1 else 5
             val speedBoost = if (hitsToSpeedUp == 1) SPEED_STEP else 0f
             if (hitsToSpeedUp == 1) hitsToSpeedUp = 5 else hitsToSpeedUp -= 1
+            viewModelScope.launch { playerRepository.addEggs(add) }
             _uiState.value = state.copy(
                 score = newScore,
                 eggY = null,
@@ -115,6 +122,19 @@ class GameViewModel @Inject constructor() : ViewModel() {
     }
 
     private fun rollGoldenBucket(): Boolean = Random.nextFloat() > 0.82f
+
+    private fun observePlayer() {
+        viewModelScope.launch {
+            playerRepository.playerState.collectLatest { player ->
+                val skin = playerRepository.skins.firstOrNull { it.id == player.selectedSkinId }
+                    ?: playerRepository.skins.first()
+                _uiState.value = _uiState.value.copy(
+                    selectedSkin = skin,
+                    eggs = player.eggs
+                )
+            }
+        }
+    }
 }
 
 data class GameUiState(
@@ -128,5 +148,7 @@ data class GameUiState(
     val goldenBucket: Boolean = false,
     val isPaused: Boolean = false,
     val isGameOver: Boolean = false,
-    val chickenX: Float = 0.5f
+    val chickenX: Float = 0.5f,
+    val selectedSkin: ChickenSkin? = null,
+    val eggs: Int = 0
 )
