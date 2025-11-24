@@ -10,7 +10,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextShadow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -30,7 +29,6 @@ fun GradientOutlinedText(
         withStyle(
             SpanStyle(
                 brush = gradient,
-                shadow = TextShadow(color = outlineColor, blurRadius = strokeWidth.dp.value)
             )
         ) {
             append(text)
@@ -44,7 +42,6 @@ fun GradientOutlinedText(
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold,
             fontSize = fontSize,
-            shadow = TextShadow(color = outlineColor, blurRadius = strokeWidth)
         )
     )
 }
