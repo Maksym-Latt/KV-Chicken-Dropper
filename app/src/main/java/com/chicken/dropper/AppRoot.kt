@@ -1,0 +1,57 @@
+package com.chicken.dropper
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.chicken.dropper.ui.screens.GameScreen
+import com.chicken.dropper.ui.screens.MainMenuScreen
+import com.chicken.dropper.ui.screens.RecordsScreen
+import com.chicken.dropper.ui.screens.ResultScreen
+import com.chicken.dropper.ui.screens.ShopScreen
+
+@Composable
+fun AppRoot(modifier: Modifier = Modifier) {
+    val navController = rememberNavController()
+    var bestScore by remember { mutableStateOf(0) }
+
+    NavHost(navController = navController, startDestination = "menu", modifier = modifier) {
+        composable("menu") {
+            MainMenuScreen(
+                onPlay = { navController.navigate("game") },
+                onRecords = { navController.navigate("records") },
+                onShop = { navController.navigate("shop") }
+            )
+        }
+        composable("game") {
+            GameScreen(onFinish = { score ->
+                bestScore = maxOf(bestScore, score)
+                navController.navigate("result/$score") { popUpTo("menu") { inclusive = false } }
+            })
+        }
+        composable("records") {
+            RecordsScreen(bestScore = bestScore, onBack = { navController.popBackStack() })
+        }
+        composable("shop") {
+            ShopScreen(onBack = { navController.popBackStack() })
+        }
+        composable(
+            route = "result/{score}",
+            arguments = listOf(navArgument("score") { type = NavType.IntType })
+        ) {
+            val score = it.arguments?.getInt("score") ?: 0
+            ResultScreen(score = score, onRetry = {
+                navController.navigate("game") { popUpTo("menu") { inclusive = false } }
+            }, onMenu = {
+                navController.popBackStack(route = "menu", inclusive = false)
+            })
+        }
+    }
+}

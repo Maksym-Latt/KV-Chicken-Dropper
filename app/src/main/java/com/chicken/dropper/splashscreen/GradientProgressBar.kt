@@ -1,4 +1,4 @@
-package com.chicken.dropper.ui.main.splashscreen
+package com.chicken.dropper.splashscreen
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth

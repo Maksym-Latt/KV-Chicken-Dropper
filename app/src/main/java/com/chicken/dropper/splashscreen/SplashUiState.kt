@@ -1,4 +1,4 @@
-package com.chicken.dropper.ui.main.splashscreen
+package com.chicken.dropper.splashscreen
 
 data class SplashUiState(
     val progress: Float = 0f,

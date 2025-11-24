@@ -1,4 +1,4 @@
-package com.rabbit.hit.audio
+package com.chicken.dropper.audio
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember

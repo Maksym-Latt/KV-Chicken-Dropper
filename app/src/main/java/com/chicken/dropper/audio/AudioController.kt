@@ -1,4 +1,4 @@
-package com.rabbit.hit.audio
+package com.chicken.dropper.audio
 
 interface AudioController {
     fun playMenuMusic()

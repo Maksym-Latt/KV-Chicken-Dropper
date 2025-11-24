@@ -1,4 +1,4 @@
-package com.rabbit.hit.audio
+package com.chicken.dropper.audio
 
 import android.content.Context
 import android.media.AudioAttributes
@@ -10,7 +10,7 @@ import android.os.VibratorManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
-import com.rabbit.hit.data.settings.SettingsRepository
+import com.chicken.dropper.data.SettingsRepository
 
 @Singleton
 class DefaultAudioController @Inject constructor(

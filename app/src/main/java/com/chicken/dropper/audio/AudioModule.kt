@@ -1,4 +1,4 @@
-package com.rabbit.hit.audio
+package com.chicken.dropper.audio
 
 import dagger.Binds
 import dagger.Module

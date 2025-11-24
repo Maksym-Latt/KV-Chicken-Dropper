@@ -1,4 +1,4 @@
-package com.chicken.dropper.ui.main.splashscreen
+package com.chicken.dropper.splashscreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,10 +17,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.ui.unit.dp
-import com.chicken.bubblefloat.R
-import com.chicken.bubblefloat.ui.main.splashscreen.AnimatedLoadingText
-import com.chicken.bubblefloat.ui.main.splashscreen.GradientProgressBar
-import com.chicken.bubblefloat.ui.theme.main.component.GameTitle
+import com.chicken.dropper.R
+import com.chicken.dropper.ui.components.GameTitle
 
 @Composable
 internal fun SplashScreen(progress: Float) {
@@ -50,28 +48,24 @@ internal fun SplashScreen(progress: Float) {
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
             Spacer(modifier = Modifier.weight(2f))
-            // ---- GAME TITLE (как на главном меню) ----
             GameTitle(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp)
             )
             Spacer(modifier = Modifier.weight(0.1f))
-            // ---- CHICKEN HERO ----
             Image(
-                painter = painterResource(id = R.drawable.chicken_1),
+                painter = painterResource(id = R.drawable.chicken_1_egg),
                 contentDescription = "Chicken mascot",
                 modifier = Modifier
                     .fillMaxWidth(0.6f),
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.weight(0.1f))
-            // ---- LOADING TEXT ----
             AnimatedLoadingText(
                 modifier = Modifier
             )
             Spacer(modifier = Modifier.weight(0.1f))
-            // ---- PROGRESS BAR ----
             GradientProgressBar(
                 progress = progress,
                 modifier = Modifier.fillMaxWidth(0.85f)
