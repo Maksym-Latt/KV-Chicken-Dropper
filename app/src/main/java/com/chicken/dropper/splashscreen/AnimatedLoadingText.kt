@@ -1,4 +1,4 @@
-package com.chicken.dropper.ui.main.splashscreen
+package com.chicken.dropper.splashscreen
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -8,7 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
-import com.chicken.bubblefloat.ui.main.component.GradientOutlinedText
+import com.chicken.dropper.ui.components.GradientOutlinedText
 import kotlinx.coroutines.delay
 
 @Composable

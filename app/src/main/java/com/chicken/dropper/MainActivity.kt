@@ -15,7 +15,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.chicken.dropper.ui.theme.ChickenDropperTheme
-import com.rabbit.hit.audio.AudioController
+import com.chicken.dropper.audio.AudioController
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

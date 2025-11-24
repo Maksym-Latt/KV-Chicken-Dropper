@@ -1,4 +1,4 @@
-package com.chicken.dropper.ui.main.splashscreen
+package com.chicken.dropper.splashscreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
