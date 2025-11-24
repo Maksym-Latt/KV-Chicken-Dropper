@@ -11,13 +11,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,6 +42,12 @@ import com.chicken.dropper.ui.viewmodel.ShopViewModel
 @Composable
 fun ShopScreen(onBack: () -> Unit, viewModel: ShopViewModel = hiltViewModel()) {
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
+    val skins = viewModel.skins
+    var currentIndex by rememberSaveable { mutableIntStateOf(0) }
+
+    if (skins.isNotEmpty() && currentIndex !in skins.indices) {
+        currentIndex = 0
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -90,23 +104,37 @@ fun ShopScreen(onBack: () -> Unit, viewModel: ShopViewModel = hiltViewModel()) {
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.weight(1f, fill = true)
-            ) {
-                viewModel.skins.forEach { skin ->
+            Box(modifier = Modifier.weight(1f, fill = true)) {
+                if (skins.isNotEmpty()) {
+                    val skin = skins[currentIndex]
                     val owned = playerState.ownedSkins.contains(skin.id)
                     val selected = playerState.selectedSkinId == skin.id
-                    SkinCard(
-                        title = skin.name,
-                        price = skin.price,
-                        owned = owned,
-                        selected = selected,
-                        image = if (selected) skin.dropSprite else skin.eggSprite,
-                        onAction = {
-                            if (owned) viewModel.onSelectSkin(skin.id) else viewModel.onBuySkin(skin)
+
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalArrangement = Arrangement.spacedBy(18.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ArrowButton(direction = ArrowDirection.Left) {
+                            currentIndex = (currentIndex - 1 + skins.size) % skins.size
                         }
-                    )
+
+                        SkinCard(
+                            title = skin.name,
+                            price = skin.price,
+                            owned = owned,
+                            selected = selected,
+                            image = if (selected) skin.dropSprite else skin.eggSprite,
+                            onAction = {
+                                if (owned) viewModel.onSelectSkin(skin.id) else viewModel.onBuySkin(skin)
+                            },
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        ArrowButton(direction = ArrowDirection.Right) {
+                            currentIndex = (currentIndex + 1) % skins.size
+                        }
+                    }
                 }
             }
         }
@@ -120,12 +148,14 @@ private fun SkinCard(
     owned: Boolean,
     selected: Boolean,
     image: Int,
-    onAction: () -> Unit
+    onAction: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Surface(
         shape = RoundedCornerShape(22.dp),
         color = Color(0xFFEDE1F8).copy(alpha = 0.72f),
-        tonalElevation = 4.dp
+        tonalElevation = 4.dp,
+        modifier = modifier.padding(horizontal = 12.dp)
     ) {
         Column(
             modifier = Modifier
@@ -158,6 +188,37 @@ private fun SkinCard(
                 onClick = onAction,
                 style = buttonStyle,
                 modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+private enum class ArrowDirection { Left, Right }
+
+@Composable
+private fun ArrowButton(direction: ArrowDirection, onClick: () -> Unit) {
+    val icon = when (direction) {
+        ArrowDirection.Left -> Icons.Default.KeyboardArrowLeft
+        ArrowDirection.Right -> Icons.Default.KeyboardArrowRight
+    }
+    val description = when (direction) {
+        ArrowDirection.Left -> "Previous skin"
+        ArrowDirection.Right -> "Next skin"
+    }
+
+    Surface(
+        onClick = onClick,
+        shape = CircleShape,
+        color = Color(0xFF4E3466).copy(alpha = 0.9f),
+        tonalElevation = 6.dp,
+        modifier = Modifier.size(64.dp)
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = icon,
+                contentDescription = description,
+                tint = Color.White,
+                modifier = Modifier.size(36.dp)
             )
         }
     }
