@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
@@ -32,40 +33,45 @@ internal fun SplashScreen(progress: Float) {
             ),
         contentAlignment = Alignment.Center
     ) {
-
         Image(
             painter = painterResource(id = R.drawable.bg_menu),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
+            alpha = 0.6f
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color(0xAAFFFFFF), Color(0x66FFF4D9))
+                    )
+                )
         )
 
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
+                .fillMaxSize()
+                .padding(horizontal = 24.dp, vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(32.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Spacer(modifier = Modifier.weight(2f))
+            Spacer(modifier = Modifier.weight(1f))
             GameTitle(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp)
+                    .graphicsLayer { alpha = 0.98f }
             )
-            Spacer(modifier = Modifier.weight(0.1f))
             Image(
                 painter = painterResource(id = R.drawable.chicken_1_egg),
                 contentDescription = "Chicken mascot",
                 modifier = Modifier
-                    .fillMaxWidth(0.6f),
-                contentScale = ContentScale.Crop
+                    .fillMaxWidth(0.64f),
+                contentScale = ContentScale.Fit
             )
-            Spacer(modifier = Modifier.weight(0.1f))
-            AnimatedLoadingText(
-                modifier = Modifier
-            )
-            Spacer(modifier = Modifier.weight(0.1f))
+            AnimatedLoadingText()
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }

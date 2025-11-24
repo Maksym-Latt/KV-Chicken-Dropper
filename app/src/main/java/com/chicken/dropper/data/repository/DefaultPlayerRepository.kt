@@ -17,9 +17,36 @@ class DefaultPlayerRepository @Inject constructor(
 ) : PlayerRepository {
 
     override val skins: List<ChickenSkin> = listOf(
-        ChickenSkin("classic", "Chicken", price = 0, eggSprite = R.drawable.chicken_1_egg, dropSprite = R.drawable.chicken_1_drop),
-        ChickenSkin("cooker", "Chicken Cooker", price = 1500, eggSprite = R.drawable.chicken_2_egg, dropSprite = R.drawable.chicken_2_drop),
-        ChickenSkin("hero", "Chicken Hero", price = 1500, eggSprite = R.drawable.chicken_3_egg, dropSprite = R.drawable.chicken_3_drop)
+        ChickenSkin(
+            id = "classic",
+            name = "Classic Chicken",
+            titleTop = "SUNNY",
+            titleBottom = "CLASSIC",
+            description = "Farm Friend",
+            price = 0,
+            eggSprite = R.drawable.chicken_1_egg,
+            dropSprite = R.drawable.chicken_1_drop
+        ),
+        ChickenSkin(
+            id = "cooker",
+            name = "Fire Chef",
+            titleTop = "SPICY",
+            titleBottom = "CHEF",
+            description = "Kitchen Fury",
+            price = 1500,
+            eggSprite = R.drawable.chicken_2_egg,
+            dropSprite = R.drawable.chicken_2_drop
+        ),
+        ChickenSkin(
+            id = "hero",
+            name = "Sky Guardian",
+            titleTop = "SKY",
+            titleBottom = "HERO",
+            description = "Brave Flyer",
+            price = 1500,
+            eggSprite = R.drawable.chicken_3_egg,
+            dropSprite = R.drawable.chicken_3_drop
+        )
     )
 
     override val playerState: Flow<PlayerState> = preferences.snapshot.map { snap ->
