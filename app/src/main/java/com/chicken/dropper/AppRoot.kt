@@ -34,7 +34,7 @@ fun AppRoot(modifier: Modifier = Modifier) {
             GameScreen(onFinish = { score ->
                 bestScore = maxOf(bestScore, score)
                 navController.navigate("result/$score") { popUpTo("menu") { inclusive = false } }
-            })
+            }, onQuit = { navController.popBackStack(route = "menu", inclusive = false) })
         }
         composable("records") {
             RecordsScreen(bestScore = bestScore, onBack = { navController.popBackStack() })
