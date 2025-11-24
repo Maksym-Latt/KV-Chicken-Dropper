@@ -6,11 +6,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -30,13 +33,13 @@ import com.chicken.dropper.R
 import com.chicken.dropper.ui.components.ChickenButtonStyle
 import com.chicken.dropper.ui.components.GameTitle
 import com.chicken.dropper.ui.components.PrimaryButton
+import com.chicken.dropper.ui.components.SecondaryButton
 import com.chicken.dropper.ui.viewmodel.MenuViewModel
-
 @Composable
 fun MainMenuScreen(
     onPlay: () -> Unit,
-    onRecords: () -> Unit,
     onShop: () -> Unit,
+    onSettings: () -> Unit,
     viewModel: MenuViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -53,53 +56,69 @@ fun MainMenuScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 20.dp, vertical = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // ---------- TOP BAR ----------
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.displayCutout),
+                    .windowInsetsPadding(WindowInsets.displayCutout),
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Surface(
-                    shape = RoundedCornerShape(18.dp),
-                    color = Color(0xFF5F2A7F).copy(alpha = 0.85f),
-                    tonalElevation = 4.dp
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(painter = painterResource(id = R.drawable.egg), contentDescription = null, modifier = Modifier.size(22.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(text = state.eggs.toString(), color = Color.White, style = MaterialTheme.typography.headlineSmall)
-                    }
-                }
+                SecondaryButton(
+                    icon = painterResource(id = R.drawable.ic_settings),
+                    onClick = onSettings
+                )
             }
 
+            // ---------- SPACE BEFORE CONTENT ----------
+            Spacer(modifier = Modifier.weight(1f))
+
+            // ---------- TITLE ----------
             GameTitle()
+
+            // ---------- CHICKEN IMAGE ----------
             Image(
-                painter = painterResource(id = when (state.selectedSkinId) {
-                    "cooker" -> R.drawable.chicken_2_egg
-                    "hero" -> R.drawable.chicken_3_egg
-                    else -> R.drawable.chicken_1_egg
-                }),
+                painter = painterResource(
+                    id = when (state.selectedSkinId) {
+                        "cooker" -> R.drawable.chicken_2_egg
+                        "hero" -> R.drawable.chicken_3_egg
+                        else -> R.drawable.chicken_1_egg
+                    }
+                ),
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .height(240.dp),
-                contentScale = ContentScale.FillHeight
+                    .fillMaxWidth(0.6f),
+                contentScale = ContentScale.Fit
             )
+
+            // ---------- SPACE ABOVE BUTTONS ----------
+            Spacer(modifier = Modifier.weight(0.5f))
+
+            // ---------- BUTTONS BLOCK ----------
             Column(
                 modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                PrimaryButton(text = "START", onClick = onPlay, style = ChickenButtonStyle.Green)
-                PrimaryButton(text = "Records", onClick = onRecords, style = ChickenButtonStyle.Magenta)
-                PrimaryButton(text = "Shop", onClick = onShop, style = ChickenButtonStyle.Magenta)
+                PrimaryButton(
+                    text = "Shop",
+                    onClick = onShop,
+                    style = ChickenButtonStyle.Magenta,
+                    modifier = Modifier.fillMaxWidth(0.7f)
+                )
+
+                PrimaryButton(
+                    text = "START",
+                    onClick = onPlay,
+                    style = ChickenButtonStyle.Green,
+                    modifier = Modifier.fillMaxWidth(0.9f)
+                )
             }
+
+            // ---------- SPACE AFTER BUTTONS ----------
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }

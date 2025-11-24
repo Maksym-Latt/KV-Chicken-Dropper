@@ -13,15 +13,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 enum class ChickenButtonStyle {
-    Green,
-    Magenta
+    Green, Magenta
 }
 
 @Composable
@@ -31,36 +33,60 @@ fun PrimaryButton(
     modifier: Modifier = Modifier,
     style: ChickenButtonStyle = ChickenButtonStyle.Green
 ) {
-    val (border, gradient) = when (style) {
+    val (border, gradientMain, gradientHighlight) = when (style) {
         ChickenButtonStyle.Green ->
-            Color(0xFF4D8F00) to listOf(Color(0xFF9CE33F), Color(0xFF61B500))
+            Triple(
+                Color(0xFF3A6B00),
+                listOf(Color(0xFF9EE94F), Color(0xFF5BAF00)),
+                listOf(Color(0xFFFFFFFF).copy(alpha = 0.45f), Color.Transparent)
+            )
 
         ChickenButtonStyle.Magenta ->
-            Color(0xFFB71679) to listOf(Color(0xFFFD84C7), Color(0xFFC23DC9))
+            Triple(
+                Color(0xFF8A1358),
+                listOf(Color(0xFF5E2C52), Color(0xFFC23DC9)),
+                listOf(Color(0xFFFFFFFF).copy(alpha = 0.45f), Color.Transparent)
+            )
     }
 
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp)
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .shadow(
+                elevation = 14.dp,
+                shape = RoundedCornerShape(22.dp),
+                ambientColor = Color.Black.copy(alpha = 0.4f),
+                spotColor = Color.Black.copy(alpha = 0.4f)
+            ),
         shape = RoundedCornerShape(22.dp),
-        tonalElevation = 6.dp,
-        shadowElevation = 12.dp,
-        border = BorderStroke(2.dp, border),
+        border = BorderStroke(3.dp, border),
         color = Color.Transparent
     ) {
         Box(
             modifier = Modifier
-                .background(Brush.verticalGradient(gradient))
-                .padding(vertical = 14.dp),
+                .background(Brush.verticalGradient(gradientMain))
+                .drawBehind {
+                    drawRect(
+                        brush = Brush.verticalGradient(gradientHighlight),
+                        alpha = 1f,
+                        topLeft = androidx.compose.ui.geometry.Offset(0f, 0f),
+                        size = androidx.compose.ui.geometry.Size(size.width, size.height * 0.45f)
+                    )
+                }
+                .padding(vertical = 8.dp),
             contentAlignment = Alignment.Center
         ) {
-            Text(
+            GradientOutlinedText(
                 text = text.uppercase(),
-                color = Color(0xFFFFFDF3),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold)
+                fontSize = 28.sp,
+                outlineWidth = 4f,
+                outlineColor = Color(0xff000000),
+                gradient = Brush.verticalGradient(
+                    listOf(Color(0xFFFFEAB4), Color(0xFFE2A53C))
+                ),
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }

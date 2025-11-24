@@ -38,6 +38,6 @@ fun AnimatedLoadingText(
         text = display,
         modifier = modifier,
         fontSize = 44.sp,
-        strokeWidth = 10f
+        outlineWidth = 4f
     )
 }

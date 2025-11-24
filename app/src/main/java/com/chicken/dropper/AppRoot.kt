@@ -26,8 +26,8 @@ fun AppRoot(modifier: Modifier = Modifier) {
         composable("menu") {
             MainMenuScreen(
                 onPlay = { navController.navigate("game") },
-                onRecords = { navController.navigate("records") },
-                onShop = { navController.navigate("shop") }
+                onShop = { navController.navigate("shop") },
+                onSettings = { navController.navigate("shop") }
             )
         }
         composable("game") {

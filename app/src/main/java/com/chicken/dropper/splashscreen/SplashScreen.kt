@@ -66,11 +66,6 @@ internal fun SplashScreen(progress: Float) {
                 modifier = Modifier
             )
             Spacer(modifier = Modifier.weight(0.1f))
-            GradientProgressBar(
-                progress = progress,
-                modifier = Modifier.fillMaxWidth(0.85f)
-            )
-            Spacer(modifier = Modifier.weight(2f))
         }
     }
 }

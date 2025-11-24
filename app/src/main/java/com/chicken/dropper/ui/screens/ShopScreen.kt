@@ -1,18 +1,25 @@
 package com.chicken.dropper.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -26,21 +33,35 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chicken.dropper.R
 import com.chicken.dropper.ui.components.ChickenButtonStyle
+import com.chicken.dropper.ui.components.EggCounter
+import com.chicken.dropper.ui.components.GradientOutlinedText
 import com.chicken.dropper.ui.components.PrimaryButton
+import com.chicken.dropper.ui.components.SecondaryButton
 import com.chicken.dropper.ui.viewmodel.ShopViewModel
 
+
 @Composable
-fun ShopScreen(onBack: () -> Unit, viewModel: ShopViewModel = hiltViewModel()) {
+fun ShopScreen(
+    onBack: () -> Unit,
+    viewModel: ShopViewModel = hiltViewModel()
+) {
     val playerState by viewModel.playerState.collectAsStateWithLifecycle()
     val skins = viewModel.skins
     var currentIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -63,48 +84,23 @@ fun ShopScreen(onBack: () -> Unit, viewModel: ShopViewModel = hiltViewModel()) {
                 .padding(horizontal = 20.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(androidx.compose.foundation.layout.WindowInsets.displayCutout)
-                    .padding(bottom = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Surface(
-                    onClick = onBack,
-                    shape = RoundedCornerShape(14.dp),
-                    color = Color(0xFFFE83C6),
-                    modifier = Modifier.size(width = 72.dp, height = 48.dp)
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(text = "Back", color = Color.White, style = MaterialTheme.typography.headlineSmall)
-                    }
-                }
-                Surface(
-                    shape = RoundedCornerShape(18.dp),
-                    color = Color(0xFF5F2A7F).copy(alpha = 0.85f),
-                    tonalElevation = 6.dp
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(painter = painterResource(id = R.drawable.egg), contentDescription = null, modifier = Modifier.size(24.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = playerState.eggs.toString(), color = Color.White, style = MaterialTheme.typography.headlineMedium)
-                    }
-                }
-            }
-
-            Text(
-                text = "Chicken skins",
-                style = MaterialTheme.typography.displaySmall,
-                color = Color.White,
-                modifier = Modifier.padding(bottom = 12.dp)
+            TopBar(
+                eggs = playerState.eggs,
+                onBack = onBack
             )
 
-            Box(modifier = Modifier.weight(1f, fill = true)) {
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TitleBlock()
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
                 if (skins.isNotEmpty()) {
                     val skin = skins[currentIndex]
                     val owned = playerState.ownedSkins.contains(skin.id)
@@ -112,24 +108,29 @@ fun ShopScreen(onBack: () -> Unit, viewModel: ShopViewModel = hiltViewModel()) {
 
                     Row(
                         modifier = Modifier.fillMaxSize(),
-                        horizontalArrangement = Arrangement.spacedBy(18.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         ArrowButton(direction = ArrowDirection.Left) {
                             currentIndex = (currentIndex - 1 + skins.size) % skins.size
                         }
 
-                        SkinCard(
-                            title = skin.name,
-                            price = skin.price,
-                            owned = owned,
-                            selected = selected,
-                            image = if (selected) skin.dropSprite else skin.eggSprite,
-                            onAction = {
-                                if (owned) viewModel.onSelectSkin(skin.id) else viewModel.onBuySkin(skin)
-                            },
-                            modifier = Modifier.weight(1f)
-                        )
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth(0.62f),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            val sprite = if (selected) skin.dropSprite else skin.eggSprite
+
+                            Image(
+                                painter = painterResource(id = sprite),
+                                contentDescription = skin.name,
+                                modifier = Modifier
+                                    .height(340.dp)
+                                    .fillMaxWidth(),
+                                contentScale = ContentScale.Fit
+                            )
+                        }
 
                         ArrowButton(direction = ArrowDirection.Right) {
                             currentIndex = (currentIndex + 1) % skins.size
@@ -137,89 +138,175 @@ fun ShopScreen(onBack: () -> Unit, viewModel: ShopViewModel = hiltViewModel()) {
                     }
                 }
             }
+
+            // 🟩 2. КНОПКА — строго под Box, внизу Columns
+            if (skins.isNotEmpty()) {
+                val skin = skins[currentIndex]
+                val owned = playerState.ownedSkins.contains(skin.id)
+                val selected = playerState.selectedSkinId == skin.id
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                ShopBottomAction(
+                    price = skin.price,
+                    owned = owned,
+                    selected = selected,
+                    eggs = playerState.eggs,
+                    onBuy = { viewModel.onBuySkin(skin) },
+                    onSelect = { viewModel.onSelectSkin(skin.id) }
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         }
     }
 }
 
+// endregion
+
+// region TopBar
+
 @Composable
-private fun SkinCard(
-    title: String,
-    price: Int,
-    owned: Boolean,
-    selected: Boolean,
-    image: Int,
-    onAction: () -> Unit,
-    modifier: Modifier = Modifier
+private fun TopBar(
+    eggs: Int,
+    onBack: () -> Unit
 ) {
-    Surface(
-        shape = RoundedCornerShape(22.dp),
-        color = Color(0xFFEDE1F8).copy(alpha = 0.72f),
-        tonalElevation = 4.dp,
-        modifier = modifier.padding(horizontal = 12.dp)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .windowInsetsPadding(WindowInsets.displayCutout)
+            .padding(bottom = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 18.dp, vertical = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Image(
-                painter = painterResource(id = image),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .height(180.dp),
-                contentScale = ContentScale.FillHeight
-            )
-            Text(
-                text = title,
-                style = MaterialTheme.typography.headlineMedium,
-                color = Color(0xFF472B13)
-            )
-            val actionLabel = when {
-                selected -> "Selected"
-                owned -> "Select"
-                else -> "${price}"
-            }
-            val buttonStyle = if (owned) ChickenButtonStyle.Magenta else ChickenButtonStyle.Green
-            PrimaryButton(
-                text = actionLabel,
-                onClick = onAction,
-                style = buttonStyle,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+        SecondaryButton(
+            icon = painterResource(id = R.drawable.ic_home),
+            onClick = onBack,
+        )
+
+        EggCounter(
+            count = eggs,
+            eggIcon = R.drawable.egg
+        )
     }
 }
+
+// endregion
+
+// region TitleBlock
+
+@Composable
+private fun TitleBlock(title1: String = "CHICKEN", title2: String = "CHICKEN") {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        // ---------- CHICKEN ----------
+        GradientOutlinedText(
+            text = title1,
+            fontSize = 54.sp,
+            outlineWidth = 10f,
+            outlineColor = Color(0xFF551A32),
+            gradient = Brush.verticalGradient(
+                listOf(Color(0xFFFF88D0), Color(0xFFCA3CC7))
+            ),
+        )
+
+        // ---------- DROPPER ----------
+        GradientOutlinedText(
+            text = title2,
+            gradient = Brush.verticalGradient(
+                listOf(Color(0xFFFFC107), Color(0xFFFFC107))
+            ),
+            outlineColor = Color(0xFF6A3C00),
+            fontSize = 54.sp,
+            outlineWidth = 10f,
+            modifier = Modifier
+                .offset(y = (-55).dp)
+        )
+    }
+}
+
+// endregion
+
+// region Arrows
 
 private enum class ArrowDirection { Left, Right }
 
 @Composable
 private fun ArrowButton(direction: ArrowDirection, onClick: () -> Unit) {
     val icon = when (direction) {
-        ArrowDirection.Left -> Icons.Default.KeyboardArrowLeft
-        ArrowDirection.Right -> Icons.Default.KeyboardArrowRight
-    }
-    val description = when (direction) {
-        ArrowDirection.Left -> "Previous skin"
-        ArrowDirection.Right -> "Next skin"
+        ArrowDirection.Left -> Icons.Filled.KeyboardArrowLeft
+        ArrowDirection.Right -> Icons.Filled.KeyboardArrowRight
     }
 
     Surface(
         onClick = onClick,
-        shape = CircleShape,
-        color = Color(0xFF4E3466).copy(alpha = 0.9f),
-        tonalElevation = 6.dp,
-        modifier = Modifier.size(64.dp)
+        shape = RoundedCornerShape(24.dp),
+        color = Color.Transparent,
+        border = BorderStroke(2.dp, Color(0xFFB88416)),
+        modifier = Modifier
+            .size(width = 46.dp, height = 80.dp)
+            .shadow(8.dp, RoundedCornerShape(24.dp), clip = false)
     ) {
-        Box(contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color(0xFFFFF682), Color(0xFFF1B01C))
+                    )
+                ),
+            contentAlignment = Alignment.Center
+        ) {
             Icon(
                 imageVector = icon,
-                contentDescription = description,
-                tint = Color.White,
-                modifier = Modifier.size(36.dp)
+                contentDescription = null,
+                tint = Color(0xFF8B4D00),
+                modifier = Modifier.size(32.dp)
             )
         }
+    }
+}
+
+// endregion
+
+// region BottomAction
+
+@Composable
+private fun ShopBottomAction(
+    price: Int,
+    owned: Boolean,
+    selected: Boolean,
+    eggs: Int,
+    onBuy: () -> Unit,
+    onSelect: () -> Unit
+) {
+    val canBuy = !owned && eggs >= price
+
+    val text = when {
+        selected -> "Selected"
+        owned -> "Select"
+        else -> price.toString()
+    }
+
+    val style = if (owned) ChickenButtonStyle.Magenta else ChickenButtonStyle.Green
+
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        PrimaryButton(
+            text = text,
+            onClick = {
+                when {
+                    selected -> Unit
+                    owned -> onSelect()
+                    canBuy -> onBuy()
+                }
+            },
+            style = style,
+            modifier = Modifier
+        )
     }
 }
