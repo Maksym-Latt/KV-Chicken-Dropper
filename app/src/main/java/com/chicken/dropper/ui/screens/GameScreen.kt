@@ -82,9 +82,16 @@ fun GameScreen(
         )
     }
 
+    val handlePauseToggle: () -> Unit = {
+        if (!state.isPaused) {
+            audioSettingsViewModel.pauseMusic()
+        }
+        viewModel.togglePause()
+    }
+
     // Назад = пауза
     BackHandler(enabled = true) {
-        viewModel.togglePause()
+        handlePauseToggle()
     }
 
     LaunchedEffect(state.isGameOver) {
@@ -150,7 +157,7 @@ fun GameScreen(
         GameTopBar(
             score = state.score,
             lives = state.lives,
-            onPause = { viewModel.togglePause() },
+            onPause = handlePauseToggle,
             scale = scale
         )
 

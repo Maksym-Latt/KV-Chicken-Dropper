@@ -10,33 +10,38 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.chicken.dropper.R
 import com.chicken.dropper.ui.components.ChickenButtonStyle
 import com.chicken.dropper.ui.components.GradientOutlinedText
 import com.chicken.dropper.ui.components.PrimaryButton
 import com.chicken.dropper.ui.components.rememberVerticalUiScale
 import com.chicken.dropper.ui.components.scaled
+import com.chicken.dropper.ui.viewmodel.ResultViewModel
 
 @Composable
 fun ResultScreen(
     score: Int,
     onRetry: () -> Unit,
-    onMenu: () -> Unit
+    onMenu: () -> Unit,
+    viewModel: ResultViewModel = hiltViewModel()
 ) {
     val scale = rememberVerticalUiScale()
+
+    LaunchedEffect(score) {
+        viewModel.rewardScore(score)
+    }
     Box(modifier = Modifier.fillMaxSize()) {
         // --- BG ---
         Image(
