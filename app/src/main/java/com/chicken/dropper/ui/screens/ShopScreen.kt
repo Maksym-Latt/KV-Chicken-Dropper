@@ -94,8 +94,6 @@ fun ShopScreen(
 
             if (currentSkin != null) {
                 TitleBlock(title1 = currentSkin.titleTop, title2 = currentSkin.titleBottom)
-            } else {
-                TitleBlock(title1 = "CHICKEN", title2 = "SHOP")
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -125,24 +123,6 @@ fun ShopScreen(
                                 .fillMaxWidth(0.62f),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text(
-                                text = skin.name,
-                                style = MaterialTheme.typography.headlineSmall.copy(
-                                    color = Color(0xFF4E2A00),
-                                    fontWeight = FontWeight.Black,
-                                    letterSpacing = 1.sp
-                                ),
-                                textAlign = TextAlign.Center
-                            )
-                            Text(
-                                text = skin.description,
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    color = Color(0xFF8B4D00),
-                                    fontWeight = FontWeight.SemiBold
-                                ),
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(bottom = 16.dp)
-                            )
                             val sprite = if (selected) skin.dropSprite else skin.eggSprite
 
                             Image(

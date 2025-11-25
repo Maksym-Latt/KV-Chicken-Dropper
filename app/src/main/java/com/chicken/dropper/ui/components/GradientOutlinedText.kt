@@ -14,8 +14,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.StrokeJoin
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -34,6 +34,12 @@ import com.chicken.dropper.R
 fun GradientOutlinedText(
     text: String,
     modifier: Modifier = Modifier,
+
+    // ----Настройки внешнего размещения----
+    fillWidth: Boolean = true,                  // было жёстко внутри → теперь настройка
+    textAlign: TextAlign = TextAlign.Center,    // по умолчанию как в твоих макетах
+
+    // ----Настройки текста----
     fontSize: TextUnit = 48.sp,
     outlineWidth: Float = 8f,
     outlineColor: Color = Color(0xFF7A4F00),
@@ -41,38 +47,46 @@ fun GradientOutlinedText(
         listOf(Color(0xFFFFE082), Color(0xFFFFD54F))
     )
 ) {
-    val fontFamily = remember { FontFamily(Font(R.font.tillana_extra_bold, weight = FontWeight.ExtraBold)) }
+    val fontFamily = remember {
+        FontFamily(Font(R.font.tillana_extra_bold, weight = FontWeight.ExtraBold))
+    }
 
     val styledText = MaterialTheme.typography.displayLarge.copy(
         fontSize = fontSize,
         fontWeight = FontWeight.ExtraBold,
         fontFamily = fontFamily,
-        textAlign = TextAlign.Center
+        textAlign = textAlign
     )
 
-    Box(
-        modifier = modifier
-    ) {
-        val content = buildAnnotatedString {
+    val internalModifier =
+        if (fillWidth) Modifier.fillMaxWidth() else Modifier
+
+    Box(modifier = modifier) {
+
+        val gradientText = buildAnnotatedString {
             withStyle(SpanStyle(brush = gradient)) { append(text) }
         }
 
+        // --- OUTLINE ---
         Text(
             text = text,
             style = styledText.copy(
                 color = outlineColor,
                 drawStyle = Stroke(width = outlineWidth, join = StrokeJoin.Round)
             ),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = internalModifier
         )
+
+        // --- FILL ---
         Text(
-            text = content,
+            text = gradientText,
             style = styledText,
             color = Color.White,
-            modifier = Modifier.fillMaxWidth()
+            modifier = internalModifier
         )
     }
 }
+
 
 
 @Composable

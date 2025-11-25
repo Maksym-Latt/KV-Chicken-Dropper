@@ -37,6 +37,7 @@ class GameViewModel @Inject constructor(
     fun dropEgg() {
         val state = _uiState.value
         if (state.isPaused || state.isGameOver || state.eggY != null) return
+        _uiState.value = state.copy(brokenEggVisible = false)
         _uiState.value = state.copy(eggY = 0f, isDropping = true, chickenLookingDown = true)
     }
 
@@ -111,12 +112,14 @@ class GameViewModel @Inject constructor(
         } else {
             val remaining = state.lives - 1
             val gameOver = remaining <= 0
+
             _uiState.value = state.copy(
                 eggY = null,
                 isDropping = false,
                 chickenLookingDown = false,
                 lives = remaining,
-                isGameOver = gameOver
+                isGameOver = gameOver,
+                brokenEggVisible = true
             )
         }
     }
@@ -135,9 +138,7 @@ class GameViewModel @Inject constructor(
             }
         }
     }
-}
-
-data class GameUiState(
+}data class GameUiState(
     val score: Int = 0,
     val lives: Int = 3,
     val bucketX: Float = 0.5f,
@@ -150,5 +151,6 @@ data class GameUiState(
     val isGameOver: Boolean = false,
     val chickenX: Float = 0.5f,
     val selectedSkin: ChickenSkin? = null,
-    val eggs: Int = 0
+    val eggs: Int = 0,
+    val brokenEggVisible: Boolean = false
 )
