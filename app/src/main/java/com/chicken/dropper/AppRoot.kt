@@ -28,12 +28,15 @@ fun AppRoot(modifier: Modifier = Modifier) {
     NavHost(navController = navController, startDestination = "menu", modifier = modifier) {
         composable("menu") {
             MainMenuScreen(
-                onPlay = { navController.navigate("game") },
+                onPlay = { navController.navigate("game?showIntro=true") },
                 onShop = { navController.navigate("shop") },
                 audioSettingsViewModel = audioViewModel
             )
         }
-        composable("game") {
+        composable(
+            route = "game?showIntro={showIntro}",
+            arguments = listOf(navArgument("showIntro") { type = NavType.BoolType; defaultValue = false })
+        ) {
             GameScreen(
                 onFinish = { score ->
                     bestScore = maxOf(bestScore, score)
@@ -55,7 +58,7 @@ fun AppRoot(modifier: Modifier = Modifier) {
         ) {
             val score = it.arguments?.getInt("score") ?: 0
             ResultScreen(score = score, onRetry = {
-                navController.navigate("game") { popUpTo("menu") { inclusive = false } }
+                navController.navigate("game?showIntro=false") { popUpTo("menu") { inclusive = false } }
             }, onMenu = {
                 navController.popBackStack(route = "menu", inclusive = false)
             })

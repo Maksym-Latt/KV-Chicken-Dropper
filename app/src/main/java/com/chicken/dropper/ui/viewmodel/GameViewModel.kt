@@ -1,5 +1,6 @@
 package com.chicken.dropper.ui.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.chicken.dropper.domain.model.ChickenSkin
@@ -20,10 +21,13 @@ private const val FALL_SPEED = 1.1f
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
-    private val playerRepository: PlayerRepository
+    private val playerRepository: PlayerRepository,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(GameUiState())
+    private val _uiState = MutableStateFlow(
+        GameUiState(showIntro = savedStateHandle.get<Boolean>("showIntro") ?: false)
+    )
     val uiState: StateFlow<GameUiState> = _uiState
 
     private var direction = 1f
@@ -173,5 +177,5 @@ data class GameUiState(
     val selectedSkin: ChickenSkin? = null,
     val eggs: Int = 0,
     val brokenEggVisible: Boolean = false,
-    val showIntro: Boolean = true
+    val showIntro: Boolean = false
 )
