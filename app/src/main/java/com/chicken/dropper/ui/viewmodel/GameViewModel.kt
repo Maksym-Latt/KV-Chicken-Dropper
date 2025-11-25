@@ -1,4 +1,4 @@
-package com.chicken.dropper.ui.screens
+package com.chicken.dropper.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -97,7 +97,7 @@ class GameViewModel @Inject constructor(
             return
         }
 
-        val hit = abs(state.bucketX - state.chickenX) < 0.09f
+        val hit = abs(state.bucketX - state.chickenX) < 0.10f
         if (hit) {
             val add = if (state.goldenBucket) 5 else 1
             val newScore = state.score + add

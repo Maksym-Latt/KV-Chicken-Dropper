@@ -1,6 +1,7 @@
 package com.chicken.dropper.ui.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,6 +41,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -57,7 +61,10 @@ import com.chicken.dropper.ui.components.SecondaryButton
 import com.chicken.dropper.ui.components.rememberVerticalUiScale
 import com.chicken.dropper.ui.components.scaled
 import com.chicken.dropper.ui.viewmodel.ShopViewModel
-
+import java.util.Collections.rotate
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
 
 @Composable
 fun ShopScreen(
@@ -85,7 +92,7 @@ fun ShopScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp.scaled(scale), vertical = 24.dp.scaled(scale)),
+                .padding(horizontal = 20.dp.scaled(scale)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             TopBar(
@@ -94,13 +101,13 @@ fun ShopScreen(
                 scale = scale
             )
 
-            Spacer(modifier = Modifier.height(8.dp.scaled(scale)))
+            Spacer(modifier = Modifier.weight(1f))
 
             if (currentSkin != null) {
                 TitleBlock(title1 = currentSkin.titleTop, title2 = currentSkin.titleBottom, scale = scale)
             }
 
-            Spacer(modifier = Modifier.height(8.dp.scaled(scale)))
+            Spacer(modifier = Modifier.weight(1f))
 
             Box(
                 modifier = Modifier
@@ -127,14 +134,13 @@ fun ShopScreen(
                                 .fillMaxWidth(0.62f),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            val sprite = if (selected) skin.dropSprite else skin.eggSprite
+                            val sprite = skin.eggSprite
 
                             Image(
                                 painter = painterResource(id = sprite),
                                 contentDescription = skin.name,
                                 modifier = Modifier
-                                    .height(340.dp.scaled(scale))
-                                    .fillMaxWidth(),
+                                    .fillMaxWidth(1f) .aspectRatio(0.65f),
                                 contentScale = ContentScale.Fit
                             )
                         }
@@ -145,6 +151,7 @@ fun ShopScreen(
                     }
                 }
             }
+            Spacer(modifier = Modifier.weight(2f))
 
             // 🟩 2. КНОПКА — строго под Box, внизу Columns
             if (skins.isNotEmpty()) {
@@ -165,6 +172,7 @@ fun ShopScreen(
 
                 Spacer(modifier = Modifier.height(8.dp.scaled(scale)))
             }
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
@@ -249,34 +257,57 @@ private fun TitleBlock(title1: String, title2: String, scale: Float = 1f) {
 // region Arrows
 
 private enum class ArrowDirection { Left, Right }
-
 @Composable
 private fun ArrowButton(
     direction: ArrowDirection,
     scale: Float = 1f,
     onClick: () -> Unit
 ) {
-    val icon = when (direction) {
-        ArrowDirection.Left -> Icons.Default.KeyboardArrowLeft
-        ArrowDirection.Right -> Icons.Default.KeyboardArrowRight
+    val gradient = Brush.verticalGradient(
+        listOf(
+            Color(0xFFFFF35A),
+            Color(0xFFFFC107)
+        )
+    )
+
+    val rotation = when (direction) {
+        ArrowDirection.Right -> 0f
+        ArrowDirection.Left -> 180f
     }
 
     Surface(
         onClick = onClick,
+        color = Color.Transparent,
         shape = CircleShape,
-        color = Color(0xFF4E3466).copy(alpha = 0.9f),
-        tonalElevation = 6.dp,
         modifier = Modifier
-            .size(64.dp)
-            .graphicsLayer(scaleX = scale, scaleY = scale)
+            .size(46.dp.scaled(scale))
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(36.dp)
-            )
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val strokeWidth = size.minDimension * 0.18f
+            val w = size.width
+            val h = size.height
+
+            val path = Path().apply {
+                moveTo(w * 0.30f, h * 0.25f)
+                lineTo(w * 0.68f, h * 0.50f)
+                lineTo(w * 0.30f, h * 0.75f)
+            }
+
+            rotate(rotation, pivot = center) {
+                drawPath(
+                    path = path,
+                    brush = gradient,
+                    style = Stroke(
+                        width = strokeWidth,
+                        cap = StrokeCap.Round,
+                        join = StrokeJoin.Round
+                    )
+                )
+            }
         }
     }
 }
@@ -319,6 +350,41 @@ private fun ShopBottomAction(
             },
             style = style,
             modifier = Modifier
-        )
+        ) {
+            if (!owned && !selected) {
+                // Цена + яйцо
+                Icon(
+                    painter = painterResource(id = R.drawable.egg),
+                    contentDescription = null,
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(28.dp)
+                )
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                GradientOutlinedText(
+                    text = price.toString(),
+                    fontSize = 26.sp,
+                    outlineWidth = 4f,
+                    outlineColor = Color(0xff000000),
+                    gradient = Brush.verticalGradient(
+                        listOf(Color(0xFFFFEAB4), Color(0xFFE2A53C))
+                    ),
+                    fillWidth = false
+                )
+            } else {
+                // Select / Selected
+                GradientOutlinedText(
+                    text = text.uppercase(),
+                    fontSize = 26.sp,
+                    outlineWidth = 4f,
+                    outlineColor = Color(0xff000000),
+                    gradient = Brush.verticalGradient(
+                        listOf(Color(0xFFFFEAB4), Color(0xFFE2A53C))
+                    ),
+                    fillWidth = false
+                )
+            }
+        }
     }
 }

@@ -31,6 +31,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -72,10 +74,9 @@ fun PauseOverlay(
         contentAlignment = Alignment.Center
     ) {
 
-        // --- центр. окно ---
         Surface(
             shape = RoundedCornerShape(26.dp),
-            border = BorderStroke(4.dp, Color.Black),  // чёрная окантовка
+            border = BorderStroke(4.dp, Color.Black),
             modifier = Modifier
                 .padding(16.dp),
             color = Color.Transparent
@@ -86,8 +87,8 @@ fun PauseOverlay(
                     .background(
                         Brush.verticalGradient(
                             listOf(
-                                Color(0xFFFFA3DA),
-                                Color(0xFF8C2A83)
+                                Color(0xffb6428a),
+                                Color(0xff694e60)
                             )
                         )
                     )
@@ -96,7 +97,7 @@ fun PauseOverlay(
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(20.dp.scaled(scale))
+                    verticalArrangement = Arrangement.spacedBy(15.dp.scaled(scale))
                 ) {
 
                     // ---------- TITLE ----------
@@ -119,16 +120,16 @@ fun PauseOverlay(
                     ) {
 
                         PauseIconToggle(
-                            iconOn = Icons.Default.MusicNote,
-                            iconOff = Icons.Default.MusicOff,
+                            iconOn = Icons.Default.VolumeUp,
+                            iconOff = Icons.Default.VolumeOff,
                             enabled = audioState.isMusicEnabled,
                             onClick = onToggleMusic,
                             scale = scale
                         )
 
                         PauseIconToggle(
-                            iconOn = Icons.Default.VolumeUp,
-                            iconOff = Icons.Default.VolumeOff,
+                            iconOn = Icons.Default.MusicNote,
+                            iconOff = Icons.Default.MusicOff,
                             enabled = audioState.isSoundEnabled,
                             onClick = onToggleSound,
                             scale = scale
@@ -153,7 +154,8 @@ private fun PauseMenuButton(text: String, onClick: () -> Unit) {
         text = text,
         onClick = onClick,
         style = ChickenButtonStyle.Magenta,
-        modifier = Modifier.fillMaxWidth(0.8f)
+        modifier = Modifier.fillMaxWidth(0.8f),
+        fontSize = 26..sp
     )
 }
 
@@ -163,7 +165,7 @@ fun PauseIconToggle(
     iconOff: ImageVector,
     enabled: Boolean,
     onClick: () -> Unit,
-    scale: Float = 1f,
+    scale: Float = 1f
 ) {
     val bg = Brush.verticalGradient(
         if (enabled)
@@ -181,28 +183,61 @@ fun PauseIconToggle(
         shape = RoundedCornerShape(14.dp),
         color = Color.Transparent,
         border = BorderStroke(2.dp, Color.Black),
-        modifier = Modifier.size(54.dp.scaled(scale))
+        modifier = Modifier.size(64.dp.scaled(scale))
     ) {
         Box(
             modifier = Modifier.background(bg),
             contentAlignment = Alignment.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .size(28.dp.scaled(scale))
-                    .drawWithCache {
-                        onDrawWithContent {
-                            drawContent()
-                            drawRect(tint, blendMode = BlendMode.SrcIn)
-                        }
-                    }
-            ) {
-                Icon(
-                    imageVector = if (enabled) iconOn else iconOff,
-                    contentDescription = null,
-                    tint = Color.White
-                )
-            }
+            GradientIcon(
+                icon = if (enabled) iconOn else iconOff,
+                tint = tint,
+                modifier = Modifier.size(48.dp.scaled(scale))
+            )
         }
     }
+}
+
+// ---------------------------
+// ICON WITH GRADIENT TINT
+// ---------------------------
+@Composable
+fun GradientIcon(
+    icon: ImageVector,
+    tint: Brush,
+    modifier: Modifier = Modifier
+) {
+    val painter = rememberVectorPainter(image = icon)
+
+    Box(
+        modifier = modifier
+            .drawWithCache {
+                onDrawWithContent {
+                    drawIntoCanvas { canvas ->
+                        val layerPaint = Paint()
+                        val bounds = Rect(Offset.Zero, size)
+
+                        // слой для маски и градиента
+                        canvas.saveLayer(bounds, layerPaint)
+
+                        // рисуем вектор белым — как маску
+                        with(painter) {
+                            draw(
+                                size = size,
+                                alpha = 1f,
+                                colorFilter = ColorFilter.tint(Color.White)
+                            )
+                        }
+
+                        // льём градиент только в пределах маски
+                        drawRect(
+                            brush = tint,
+                            blendMode = BlendMode.SrcIn
+                        )
+
+                        canvas.restore()
+                    }
+                }
+            }
+    )
 }

@@ -2,14 +2,12 @@ package com.chicken.dropper.ui.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,14 +16,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,14 +24,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,14 +39,13 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chicken.dropper.R
-import com.chicken.dropper.ui.components.ChickenButtonStyle
 import com.chicken.dropper.ui.components.GradientOutlinedText
-import com.chicken.dropper.ui.components.PrimaryButton
 import com.chicken.dropper.ui.components.SecondaryButton
 import com.chicken.dropper.ui.components.rememberVerticalUiScale
 import com.chicken.dropper.ui.components.scaled
 import com.chicken.dropper.ui.screens.Overlay.PauseOverlay
 import com.chicken.dropper.ui.viewmodel.AudioSettingsViewModel
+import com.chicken.dropper.ui.viewmodel.GameViewModel
 
 @Composable
 fun GameScreen(
@@ -179,7 +166,7 @@ fun GameScreen(
                 painter = painterResource(id = chickenRes),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(180.dp.scaled(scale))
+                    .size(180.dp.scaled(scale)) .offset(y = 15.dp.scaled(scale))
             )
 
             // ПЛИТА
@@ -243,7 +230,7 @@ fun GameScreen(
                 Image(
                     painter = painterResource(id = R.drawable.egg_broke),
                     contentDescription = null,
-                    modifier = Modifier.size(72.dp.scaled(scale))
+                    modifier = Modifier.size(92.dp.scaled(scale))
                 )
             }
         }

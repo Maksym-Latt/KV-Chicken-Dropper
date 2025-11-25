@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -96,7 +97,7 @@ fun ResultScreen(
                 painter = painterResource(id = R.drawable.chicken_1_drop),
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth(0.65f),
+                    .fillMaxWidth(0.6f).aspectRatio(0.65f),
                 contentScale = ContentScale.Crop
             )
 
@@ -122,7 +123,7 @@ fun ResultScreen(
                 )
 
                 PrimaryButton(
-                    text = "START",
+                    text = "MENU",
                     onClick = onMenu,
                     style = ChickenButtonStyle.Green,
                     modifier = Modifier.fillMaxWidth(0.8f)

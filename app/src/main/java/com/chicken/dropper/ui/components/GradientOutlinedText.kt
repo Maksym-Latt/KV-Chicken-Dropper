@@ -36,8 +36,8 @@ fun GradientOutlinedText(
     modifier: Modifier = Modifier,
 
     // ----Настройки внешнего размещения----
-    fillWidth: Boolean = true,                  // было жёстко внутри → теперь настройка
-    textAlign: TextAlign = TextAlign.Center,    // по умолчанию как в твоих макетах
+    fillWidth: Boolean = true,
+    textAlign: TextAlign = TextAlign.Center,
 
     // ----Настройки текста----
     fontSize: TextUnit = 48.sp,
@@ -84,74 +84,5 @@ fun GradientOutlinedText(
             color = Color.White,
             modifier = internalModifier
         )
-    }
-}
-
-
-
-@Composable
-fun AutoResizeGradientText(
-    text: String,
-    modifier: Modifier = Modifier,
-    maxFontSize: TextUnit = 40.sp,
-    minFontSize: TextUnit = 18.sp,
-    gradient: Brush,
-    strokeWidth: Float = 6f
-)   {
-    var fittedSize by remember { mutableStateOf(maxFontSize) }
-    var ready by remember { mutableStateOf(false) }
-
-    val density = LocalDensity.current
-
-    BoxWithConstraints(modifier) {
-
-        val maxWidthPx = constraints.maxWidth.toFloat()
-        val maxHeightPx = constraints.maxHeight.toFloat()
-
-        LaunchedEffect(text, maxWidthPx, maxHeightPx) {
-            var size = maxFontSize
-
-            with(density) {
-                while (size > minFontSize) {
-
-                    val px = size.toPx()
-
-                    val paint = android.graphics.Paint().apply {
-                        textSize = px
-                        isFakeBoldText = true
-                        this.strokeWidth = strokeWidth
-                        style = android.graphics.Paint.Style.FILL_AND_STROKE
-                    }
-
-                    val width = paint.measureText(text)
-                    val height = paint.fontMetrics.run { bottom - top }
-
-                    val fitsWidth = width <= maxWidthPx
-                    val fitsHeight = height <= maxHeightPx
-
-                    if (fitsWidth && fitsHeight) break
-
-                    size *= 0.88f
-                }
-
-                fittedSize = size
-                ready = true
-            }
-        }
-
-        if (ready) {
-            val annotated = buildAnnotatedString {
-                withStyle(SpanStyle(brush = gradient)) { append(text) }
-            }
-
-            Text(
-                text = annotated,
-                fontSize = fittedSize,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                modifier = Modifier,
-            )
-        }
     }
 }

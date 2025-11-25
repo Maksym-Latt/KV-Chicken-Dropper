@@ -20,7 +20,7 @@ class DefaultPlayerRepository @Inject constructor(
         ChickenSkin(
             id = "classic",
             name = "Classic Chicken",
-            titleTop = "SUNNY",
+            titleTop = "CHICKEN",
             titleBottom = "CLASSIC",
             description = "Farm Friend",
             price = 0,
@@ -30,8 +30,8 @@ class DefaultPlayerRepository @Inject constructor(
         ChickenSkin(
             id = "cooker",
             name = "Fire Chef",
-            titleTop = "SPICY",
-            titleBottom = "CHEF",
+            titleTop = "CHICKEN",
+            titleBottom = "COOKER",
             description = "Kitchen Fury",
             price = 1500,
             eggSprite = R.drawable.chicken_2_egg,
@@ -40,7 +40,7 @@ class DefaultPlayerRepository @Inject constructor(
         ChickenSkin(
             id = "hero",
             name = "Sky Guardian",
-            titleTop = "SKY",
+            titleTop = "CHICKEN",
             titleBottom = "HERO",
             description = "Brave Flyer",
             price = 1500,

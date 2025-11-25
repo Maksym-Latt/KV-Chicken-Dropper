@@ -1,9 +1,13 @@
 package com.chicken.dropper.ui.components
 
+import android.R.attr.text
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,10 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -31,21 +37,21 @@ fun PrimaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    style: ChickenButtonStyle = ChickenButtonStyle.Green
+    style: ChickenButtonStyle = ChickenButtonStyle.Green,
+    fontSize: TextUnit = 32.sp,
+    content: (@Composable RowScope.() -> Unit)? = null
 ) {
-    val (border, gradientMain, gradientHighlight) = when (style) {
+    val (border, gradientMain) = when (style) {
         ChickenButtonStyle.Green ->
-            Triple(
-                Color(0xFF3A6B00),
-                listOf(Color(0xFF9EE94F), Color(0xFF5BAF00)),
-                listOf(Color(0xFFFFFFFF).copy(alpha = 0.45f), Color.Transparent)
+            Pair(
+                Color(0xFF1F3406),
+                listOf(Color(0xFF9FEF26), Color(0xFF448B0D))
             )
 
         ChickenButtonStyle.Magenta ->
-            Triple(
-                Color(0xFF8A1358),
-                listOf(Color(0xFF5E2C52), Color(0xFFC23DC9)),
-                listOf(Color(0xFFFFFFFF).copy(alpha = 0.45f), Color.Transparent)
+            Pair(
+                Color(0xFF44092B),
+                listOf(Color(0xFFEB55B4), Color(0xFFA47E97))
             )
     }
 
@@ -61,33 +67,36 @@ fun PrimaryButton(
                 spotColor = Color.Black.copy(alpha = 0.4f)
             ),
         shape = RoundedCornerShape(22.dp),
-        border = BorderStroke(3.dp, border),
+        border = BorderStroke(2.dp, border),
         color = Color.Transparent
     ) {
         Box(
             modifier = Modifier
-                .background(Brush.verticalGradient(gradientMain))
-                .drawBehind {
-                    drawRect(
-                        brush = Brush.verticalGradient(gradientHighlight),
-                        alpha = 1f,
-                        topLeft = androidx.compose.ui.geometry.Offset(0f, 0f),
-                        size = androidx.compose.ui.geometry.Size(size.width, size.height * 0.45f)
-                    )
-                }
+                .background(
+                    Brush.verticalGradient(gradientMain)
+                )
                 .padding(vertical = 8.dp),
             contentAlignment = Alignment.Center
         ) {
-            GradientOutlinedText(
-                text = text.uppercase(),
-                fontSize = 26.sp,
-                outlineWidth = 4f,
-                outlineColor = Color(0xff000000),
-                gradient = Brush.verticalGradient(
-                    listOf(Color(0xFFFFEAB4), Color(0xFFE2A53C))
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
+            if (content != null) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    content = content
+                )
+            } else {
+                GradientOutlinedText(
+                    text = text.uppercase(),
+                    fontSize = fontSize,
+                    outlineWidth = 4f,
+                    outlineColor = Color(0xff000000),
+                    gradient = Brush.verticalGradient(
+                        listOf(Color(0xFFEDE622), Color(0xFFE1AC14))
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     }
 }
+

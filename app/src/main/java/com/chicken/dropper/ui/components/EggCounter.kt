@@ -1,11 +1,13 @@
 package com.chicken.dropper.ui.components
 
+import android.R.attr.text
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -70,14 +72,16 @@ fun EggCounter(
                 modifier = Modifier.height(height - verticalPadding * 2),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AutoResizeGradientText(
+                GradientOutlinedText(
                     text = count.toString(),
-                    maxFontSize = 44.sp,
-                    minFontSize = 16.sp,
+                    fontSize = 26.sp,
+                    outlineWidth = 4f,
+                    fillWidth = false,
+                    outlineColor = Color(0xff000000),
                     gradient = Brush.verticalGradient(
-                        listOf(Color.White, Color.White)
+                        listOf(Color(0xFFFFFFFF), Color(0xFFFFFFFF))
                     ),
-                    strokeWidth = 8f
+                    modifier = Modifier
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Image(
