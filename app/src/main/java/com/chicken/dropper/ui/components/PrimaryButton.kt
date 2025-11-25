@@ -80,7 +80,7 @@ fun PrimaryButton(
         ) {
             GradientOutlinedText(
                 text = text.uppercase(),
-                fontSize = 28.sp,
+                fontSize = 26.sp,
                 outlineWidth = 4f,
                 outlineColor = Color(0xff000000),
                 gradient = Brush.verticalGradient(

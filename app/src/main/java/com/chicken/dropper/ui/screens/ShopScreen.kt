@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -189,14 +190,14 @@ private fun TopBar(
         SecondaryButton(
             icon = painterResource(id = R.drawable.ic_home),
             onClick = onBack,
-            buttonSize = 60.dp.scaled(scale),
-            iconSize = 30.dp.scaled(scale)
+            buttonSize = 50.dp.scaled(scale),
+            iconSize = 40.dp.scaled(scale)
         )
 
         EggCounter(
             count = eggs,
             eggIcon = R.drawable.egg,
-            height = 60.dp.scaled(scale),
+            height = 50.dp.scaled(scale),
             horizontalPadding = 18.dp.scaled(scale),
             verticalPadding = 6.dp.scaled(scale),
             cornerRadius = 30.dp.scaled(scale),
@@ -250,35 +251,31 @@ private fun TitleBlock(title1: String, title2: String, scale: Float = 1f) {
 private enum class ArrowDirection { Left, Right }
 
 @Composable
-private fun ArrowButton(direction: ArrowDirection, onClick: () -> Unit, scale: Float = 1f) {
+private fun ArrowButton(
+    direction: ArrowDirection,
+    scale: Float = 1f,
+    onClick: () -> Unit
+) {
     val icon = when (direction) {
-        ArrowDirection.Left -> Icons.Filled.KeyboardArrowLeft
-        ArrowDirection.Right -> Icons.Filled.KeyboardArrowRight
+        ArrowDirection.Left -> Icons.Default.KeyboardArrowLeft
+        ArrowDirection.Right -> Icons.Default.KeyboardArrowRight
     }
 
     Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(24.dp),
-        color = Color.Transparent,
-        border = BorderStroke(2.dp, Color(0xFFB88416)),
+        shape = CircleShape,
+        color = Color(0xFF4E3466).copy(alpha = 0.9f),
+        tonalElevation = 6.dp,
         modifier = Modifier
-            .size(width = 46.dp.scaled(scale), height = 80.dp.scaled(scale))
-            .shadow(8.dp.scaled(scale), RoundedCornerShape(24.dp), clip = false)
+            .size(64.dp)
+            .graphicsLayer(scaleX = scale, scaleY = scale)
     ) {
-        Box(
-            modifier = Modifier
-                .background(
-                    Brush.verticalGradient(
-                        listOf(Color(0xFFFFF682), Color(0xFFF1B01C))
-                    )
-                ),
-            contentAlignment = Alignment.Center
-        ) {
+        Box(contentAlignment = Alignment.Center) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color(0xFF8B4D00),
-                modifier = Modifier.size(32.dp.scaled(scale))
+                tint = Color.White,
+                modifier = Modifier.size(36.dp)
             )
         }
     }

@@ -275,8 +275,8 @@ fun GameTopBar(
         SecondaryButton(
             icon = painterResource(id = R.drawable.ic_pause),
             onClick = onPause,
-            buttonSize = 60.dp.scaled(scale),
-            iconSize = 32.dp.scaled(scale)
+            buttonSize = 50.dp.scaled(scale),
+            iconSize = 40.dp.scaled(scale)
         )
 
         // ---- SCORE + HEARTS ----

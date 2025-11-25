@@ -81,8 +81,8 @@ fun MainMenuScreen(
                 SecondaryButton(
                     icon = painterResource(id = R.drawable.ic_settings),
                     onClick = { showSettings = true },
-                    buttonSize = 60.dp.scaled(scale),
-                    iconSize = 30.dp.scaled(scale)
+                    buttonSize = 50.dp.scaled(scale),
+                    iconSize = 40.dp.scaled(scale)
                 )
             }
 
@@ -103,7 +103,7 @@ fun MainMenuScreen(
                 ),
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth(0.65f),
+                    .fillMaxWidth(0.5f),
                 contentScale = ContentScale.Crop
             )
 
