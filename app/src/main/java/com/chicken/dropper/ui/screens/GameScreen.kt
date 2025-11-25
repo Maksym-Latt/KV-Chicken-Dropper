@@ -70,9 +70,6 @@ fun GameScreen(
     }
 
     val handlePauseToggle: () -> Unit = {
-        if (!state.isPaused) {
-            audioSettingsViewModel.pauseMusic()
-        }
         viewModel.togglePause()
     }
 
@@ -86,14 +83,6 @@ fun GameScreen(
     }
 
     LaunchedEffect(Unit) { audioSettingsViewModel.playGameMusic() }
-    LaunchedEffect(state.isPaused) {
-        if (state.isPaused) {
-            audioSettingsViewModel.pauseMusic()
-        } else {
-            audioSettingsViewModel.resumeMusic()
-        }
-    }
-
     var lastScore by remember { mutableStateOf(state.score) }
     var lastLives by remember { mutableStateOf(state.lives) }
 
