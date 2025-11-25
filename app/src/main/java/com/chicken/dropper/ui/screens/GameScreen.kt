@@ -6,15 +6,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -22,31 +24,27 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -57,6 +55,8 @@ import com.chicken.dropper.ui.components.ChickenButtonStyle
 import com.chicken.dropper.ui.components.GradientOutlinedText
 import com.chicken.dropper.ui.components.PrimaryButton
 import com.chicken.dropper.ui.components.SecondaryButton
+import com.chicken.dropper.ui.components.rememberVerticalUiScale
+import com.chicken.dropper.ui.components.scaled
 import com.chicken.dropper.ui.screens.Overlay.PauseOverlay
 import com.chicken.dropper.ui.viewmodel.AudioSettingsViewModel
 
@@ -69,6 +69,7 @@ fun GameScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val audioState by audioSettingsViewModel.state.collectAsStateWithLifecycle()
+    val scale = rememberVerticalUiScale()
 
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(lifecycleOwner) {
@@ -124,10 +125,7 @@ fun GameScreen(
         lastLives = state.lives
     }
 
-    val screenWidth = LocalConfiguration.current.screenWidthDp
-    val bucketX = (state.bucketX * screenWidth).dp - 48.dp
-
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .pointerInput(Unit) {
@@ -136,6 +134,10 @@ fun GameScreen(
                 }
             }
     ) {
+        val bucketWidth = (maxWidth.value * 0.33f).dp
+            .coerceIn(96.dp.scaled(scale), 180.dp.scaled(scale))
+        val bucketHeight = (bucketWidth.value * 0.83f).dp
+        val bucketX = (state.bucketX * maxWidth.value).dp - bucketWidth / 2
 
         Image(
             painter = painterResource(id = R.drawable.bg_game),
@@ -148,14 +150,15 @@ fun GameScreen(
         GameTopBar(
             score = state.score,
             lives = state.lives,
-            onPause = { viewModel.togglePause() }
+            onPause = { viewModel.togglePause() },
+            scale = scale
         )
 
         // ---------- PLATE + CHICKEN ----------
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 80.dp),
+                .padding(top = 80.dp.scaled(scale)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
@@ -169,7 +172,7 @@ fun GameScreen(
                 painter = painterResource(id = chickenRes),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(180.dp)
+                    .size(180.dp.scaled(scale))
             )
 
             // ПЛИТА
@@ -178,7 +181,7 @@ fun GameScreen(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
+                    .padding(horizontal = 24.dp.scaled(scale)),
                 contentScale = ContentScale.Fit
             )
         }
@@ -187,9 +190,8 @@ fun GameScreen(
 
         // ---------- EGG FALLING ----------
         state.eggY?.let { eggPos ->
-            val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-            val bucketHeight = 100.dp
-            val eggMaxY = screenHeight - bucketHeight - 40.dp
+            val screenHeight = maxHeight
+            val eggMaxY = screenHeight - bucketHeight - 40.dp.scaled(scale)
 
             val density = LocalDensity.current
 
@@ -201,7 +203,7 @@ fun GameScreen(
                 painter = painterResource(id = R.drawable.egg),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(44.dp.scaled(scale))
                     .align(Alignment.TopCenter)
                     .offset(y = eggYOffset)
             )
@@ -211,14 +213,14 @@ fun GameScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 48.dp),
+                .padding(bottom = 48.dp.scaled(scale)),
             contentAlignment = Alignment.BottomStart
         ) {
             Image(
                 painter = painterResource(id = R.drawable.bucket),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(width = 120.dp, height = 100.dp)
+                    .size(width = bucketWidth, height = bucketHeight)
                     .offset(x = bucketX)
             )
         }
@@ -228,13 +230,13 @@ fun GameScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 22.dp),
+                    .padding(bottom = 22.dp.scaled(scale)),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.egg_broke),
                     contentDescription = null,
-                    modifier = Modifier.size(72.dp)
+                    modifier = Modifier.size(72.dp.scaled(scale))
                 )
             }
         }
@@ -257,7 +259,8 @@ fun GameScreen(
 fun GameTopBar(
     score: Int,
     lives: Int,
-    onPause: () -> Unit
+    onPause: () -> Unit,
+    scale: Float = 1f,
 ) {
     Row(
         modifier = Modifier
@@ -272,8 +275,8 @@ fun GameTopBar(
         SecondaryButton(
             icon = painterResource(id = R.drawable.ic_pause),
             onClick = onPause,
-            buttonSize = 60.dp,
-            iconSize = 32.dp
+            buttonSize = 60.dp.scaled(scale),
+            iconSize = 32.dp.scaled(scale)
         )
 
         // ---- SCORE + HEARTS ----
@@ -284,7 +287,7 @@ fun GameTopBar(
             // --- SCORE ---
             GradientOutlinedText(
                 text = "Score: ${score.toString().padStart(4, '0')}",
-                fontSize = 22.sp,
+                fontSize = 22.sp.scaled(scale),
                 outlineWidth = 7f,
                 fillWidth = false,
                 textAlign = TextAlign.Left,
@@ -296,14 +299,14 @@ fun GameTopBar(
 
             // --- HEARTS ---
             Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp.scaled(scale)),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 repeat(lives) {
                     Image(
                         painter = painterResource(id = R.drawable.heart),
                         contentDescription = null,
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(40.dp.scaled(scale))
                     )
                 }
             }
