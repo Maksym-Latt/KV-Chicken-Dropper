@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
@@ -138,6 +139,24 @@ fun GameScreen(
             scale = scale
         )
 
+        if (state.comboStreak >= 3) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 56.dp.scaled(scale)),
+                contentAlignment = Alignment.Center
+            ) {
+                GradientOutlinedText(
+                    text = "Комбо x${state.comboStreak}",
+                    fontSize = 26.sp.scaled(scale),
+                    outlineWidth = 8f,
+                    gradient = Brush.horizontalGradient(
+                        listOf(Color(0xFFFFF176), Color(0xFFFFD54F))
+                    )
+                )
+            }
+        }
+
         // ---------- PLATE + CHICKEN ----------
         Column(
             modifier = Modifier
@@ -205,7 +224,10 @@ fun GameScreen(
                 contentDescription = null,
                 modifier = Modifier
                     .size(width = bucketWidth, height = bucketHeight)
-                    .offset(x = bucketX)
+                    .offset(x = bucketX),
+                colorFilter = if (state.goldenBucket) ColorFilter.tint(
+                    Color(0xFFFFD54F).copy(alpha = 0.85f)
+                ) else null
             )
         }
 

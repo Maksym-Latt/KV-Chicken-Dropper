@@ -32,6 +32,7 @@ class GameViewModel @Inject constructor(
 
     private var direction = 1f
     private var hitsToSpeedUp = 5
+    private var comboStreak = 0
 
     init {
         observePlayer()
@@ -64,6 +65,7 @@ class GameViewModel @Inject constructor(
     fun restart() {
         direction = 1f
         hitsToSpeedUp = 5
+        comboStreak = 0
         val currentState = _uiState.value
         _uiState.value = GameUiState(
             bucketSpeed = BASE_BUCKET_SPEED,
@@ -117,23 +119,28 @@ class GameViewModel @Inject constructor(
 
         val hit = abs(state.bucketX - state.chickenX) < 0.10f
         if (hit) {
-            val add = if (state.goldenBucket) 10 else 1
-            val newScore = state.score + add
+            comboStreak += 1
+            val comboMultiplier = if (comboStreak >= 3) comboStreak - 1 else 1
+            val baseAdd = if (state.goldenBucket) 10 else 1
+            val addedScore = baseAdd * comboMultiplier
+            val newScore = state.score + addedScore
             val nextHitsLeft = if (hitsToSpeedUp > 1) hitsToSpeedUp - 1 else 5
             val speedBoost = if (hitsToSpeedUp == 1) SPEED_STEP else 0f
             if (hitsToSpeedUp == 1) hitsToSpeedUp = 5 else hitsToSpeedUp -= 1
-            viewModelScope.launch { playerRepository.addEggs(add) }
+            viewModelScope.launch { playerRepository.addEggs(baseAdd) }
             _uiState.value = state.copy(
                 score = newScore,
                 eggY = null,
                 isDropping = false,
                 chickenLookingDown = false,
                 bucketSpeed = state.bucketSpeed + speedBoost,
-                goldenBucket = rollGoldenBucket()
+                goldenBucket = rollGoldenBucket(),
+                comboStreak = comboStreak
             )
         } else {
             val remaining = state.lives - 1
             val gameOver = remaining <= 0
+            comboStreak = 0
 
             _uiState.value = state.copy(
                 eggY = null,
@@ -141,7 +148,8 @@ class GameViewModel @Inject constructor(
                 chickenLookingDown = false,
                 lives = remaining,
                 isGameOver = gameOver,
-                brokenEggVisible = true
+                brokenEggVisible = true,
+                comboStreak = comboStreak
             )
         }
     }
@@ -177,5 +185,6 @@ data class GameUiState(
     val selectedSkin: ChickenSkin? = null,
     val eggs: Int = 0,
     val brokenEggVisible: Boolean = false,
-    val showIntro: Boolean = false
+    val showIntro: Boolean = false,
+    val comboStreak: Int = 0
 )
