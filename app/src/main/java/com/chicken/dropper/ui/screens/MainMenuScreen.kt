@@ -100,7 +100,7 @@ fun MainMenuScreen(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth(0.6f),
-                contentScale = ContentScale.Fit
+                contentScale = ContentScale.Crop
             )
 
             // ---------- SPACE ABOVE BUTTONS ----------

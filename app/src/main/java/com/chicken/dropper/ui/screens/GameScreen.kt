@@ -42,6 +42,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -158,7 +159,15 @@ fun GameScreen(
 
         // ---------- EGG FALLING ----------
         state.eggY?.let { eggPos ->
-            val eggYOffset = (eggPos * (LocalConfiguration.current.screenHeightDp - 230)).dp
+            val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+            val bucketHeight = 100.dp
+            val eggMaxY = screenHeight - bucketHeight - 40.dp
+
+            val density = LocalDensity.current
+
+            val eggYOffset = with(density) {
+                (eggPos * eggMaxY.toPx()).toDp()
+            }
 
             Image(
                 painter = painterResource(id = R.drawable.egg),

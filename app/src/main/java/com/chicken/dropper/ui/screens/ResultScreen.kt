@@ -1,59 +1,127 @@
 package com.chicken.dropper.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.chicken.dropper.R
+import com.chicken.dropper.ui.components.ChickenButtonStyle
 import com.chicken.dropper.ui.components.GameTitle
+import com.chicken.dropper.ui.components.GradientOutlinedText
 import com.chicken.dropper.ui.components.PrimaryButton
 
 @Composable
-fun ResultScreen(score: Int, onRetry: () -> Unit, onMenu: () -> Unit) {
+fun ResultScreen(
+    score: Int,
+    onRetry: () -> Unit,
+    onMenu: () -> Unit
+) {
     Box(modifier = Modifier.fillMaxSize()) {
+        // --- BG ---
         Image(
-            painter = painterResource(id = R.drawable.bg_menu),
+            painter = painterResource(id = R.drawable.bg_game),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
+
+        // --- DARK OVERLAY ---
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xAA000000))
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 32.dp, vertical = 48.dp),
+                .padding(horizontal = 32.dp, vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            GameTitle()
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Image(
-                    painter = painterResource(id = R.drawable.chicken_1_drop),
-                    contentDescription = null,
+            Spacer(modifier = Modifier.weight(1f))
+            // ---------- TITLE ----------
+            GradientOutlinedText(
+                text = "Score of eggs:",
+                fontSize = 32.sp,
+                outlineWidth = 10f,
+                textAlign = TextAlign.Center,
+                fillWidth = false,
+                outlineColor = Color(0xFF6A3C00),
+                gradient = Brush.verticalGradient(
+                    listOf(Color(0xFFFFF38A), Color(0xFFFFC300))
+                )
+            )
+
+            GradientOutlinedText(
+                text = score.toString(),
+                fontSize = 24.sp,
+                outlineWidth = 10f,
+                textAlign = TextAlign.Center,
+                fillWidth = false,
+                outlineColor = Color(0xFF6A3C00),
+                gradient = Brush.verticalGradient(
+                    listOf(Color(0xFFFFD48A), Color(0xFFFF9900))
+                )
+            )
+
+            // ---------- CHICKEN ----------
+            Image(
+                painter = painterResource(id = R.drawable.chicken_1_drop),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth(0.6f),
+                contentScale = ContentScale.Crop
+            )
+
+            // ---------- BROKEN EGG ----------
+            Image(
+                painter = painterResource(id = R.drawable.egg_broke),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(140.dp)
+            )
+
+            // ---------- BUTTONS ----------
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                PrimaryButton(
+                    text = "Retry",
+                    onClick = onRetry,
+                    style = ChickenButtonStyle.Magenta,
                     modifier = Modifier.fillMaxWidth(0.6f)
                 )
-                Text(
-                    text = "Eggs in buckets: $score",
-                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold, fontSize = 28.sp),
-                    modifier = Modifier.padding(top = 16.dp)
+
+                PrimaryButton(
+                    text = "START",
+                    onClick = onMenu,
+                    style = ChickenButtonStyle.Green,
+                    modifier = Modifier.fillMaxWidth(0.8f)
                 )
             }
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                PrimaryButton(text = "Retry", onClick = onRetry)
-                PrimaryButton(text = "Menu", onClick = onMenu)
-            }
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }

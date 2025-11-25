@@ -37,8 +37,12 @@ class GameViewModel @Inject constructor(
     fun dropEgg() {
         val state = _uiState.value
         if (state.isPaused || state.isGameOver || state.eggY != null) return
-        _uiState.value = state.copy(brokenEggVisible = false)
-        _uiState.value = state.copy(eggY = 0f, isDropping = true, chickenLookingDown = true)
+        _uiState.value = state.copy(
+            brokenEggVisible = false,
+            eggY = 0f,
+            isDropping = true,
+            chickenLookingDown = true
+        )
     }
 
     fun togglePause() {
@@ -93,7 +97,7 @@ class GameViewModel @Inject constructor(
             return
         }
 
-        val hit = abs(state.bucketX - state.chickenX) < 0.12f
+        val hit = abs(state.bucketX - state.chickenX) < 0.09f
         if (hit) {
             val add = if (state.goldenBucket) 5 else 1
             val newScore = state.score + add
