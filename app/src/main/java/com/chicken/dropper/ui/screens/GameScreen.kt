@@ -63,7 +63,7 @@ fun GameScreen(
         lifecycleOwner.lifecycle.addObserver(
             LifecycleEventObserver { _, event ->
                 if (event == Lifecycle.Event.ON_PAUSE) {
-                    viewModel.togglePause()
+                    viewModel.pause()
                 }
             }
         )
@@ -75,7 +75,7 @@ fun GameScreen(
 
     // Назад = пауза
     BackHandler(enabled = true) {
-        handlePauseToggle()
+        viewModel.pause()
     }
 
     LaunchedEffect(state.isGameOver) {

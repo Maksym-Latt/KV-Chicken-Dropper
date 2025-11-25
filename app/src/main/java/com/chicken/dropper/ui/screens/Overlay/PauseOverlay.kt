@@ -155,7 +155,7 @@ private fun PauseMenuButton(text: String, onClick: () -> Unit) {
         onClick = onClick,
         style = ChickenButtonStyle.Magenta,
         modifier = Modifier.fillMaxWidth(0.8f),
-        fontSize = 26..sp
+        fontSize = 26.sp
     )
 }
 

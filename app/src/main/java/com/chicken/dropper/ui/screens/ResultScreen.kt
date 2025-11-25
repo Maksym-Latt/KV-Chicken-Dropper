@@ -119,14 +119,15 @@ fun ResultScreen(
                     text = "Retry",
                     onClick = onRetry,
                     style = ChickenButtonStyle.Magenta,
-                    modifier = Modifier.fillMaxWidth(0.6f)
+                    modifier = Modifier.fillMaxWidth(0.65f),
+                    fontSize = 28.sp
                 )
 
                 PrimaryButton(
                     text = "MENU",
                     onClick = onMenu,
                     style = ChickenButtonStyle.Green,
-                    modifier = Modifier.fillMaxWidth(0.8f)
+                    modifier = Modifier.fillMaxWidth(0.85f)
                 )
             }
             Spacer(modifier = Modifier.weight(1f))

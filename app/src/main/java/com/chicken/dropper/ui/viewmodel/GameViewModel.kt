@@ -68,6 +68,10 @@ class GameViewModel @Inject constructor(
         }
     }
 
+    fun pause() {
+        _uiState.value = _uiState.value.copy(isPaused = true)
+    }
+
     private fun tick(delta: Float) {
         val state = _uiState.value
         if (state.isPaused || state.isGameOver) return
