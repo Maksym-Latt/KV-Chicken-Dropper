@@ -30,7 +30,6 @@ public fun PauseOverlay(
     audioState: AudioSettingsState,
     onToggleMusic: () -> Unit,
     onToggleSound: () -> Unit,
-    onToggleVibration: () -> Unit,
     onResume: () -> Unit,
     onRestart: () -> Unit,
     onQuit: () -> Unit
@@ -68,11 +67,6 @@ public fun PauseOverlay(
                         icon = R.drawable.ic_sound,
                         isEnabled = audioState.isSoundEnabled,
                         onClick = onToggleSound
-                    )
-                    AudioToggleButton(
-                        icon = R.drawable.ic_vibration,
-                        isEnabled = audioState.isVibrationEnabled,
-                        onClick = onToggleVibration
                     )
                 }
                 PrimaryButton(text = "Continue", onClick = onResume, style = ChickenButtonStyle.Magenta)
