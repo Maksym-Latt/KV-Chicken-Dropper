@@ -54,14 +54,17 @@ import com.chicken.dropper.ui.components.GradientOutlinedText
 import com.chicken.dropper.ui.components.PrimaryButton
 import com.chicken.dropper.ui.components.SecondaryButton
 import com.chicken.dropper.ui.screens.Overlay.PauseOverlay
+import com.chicken.dropper.ui.viewmodel.AudioSettingsViewModel
 
 @Composable
 fun GameScreen(
     onFinish: (Int) -> Unit,
     onQuit: () -> Unit,
+    audioSettingsViewModel: AudioSettingsViewModel,
     viewModel: GameViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val audioState by audioSettingsViewModel.state.collectAsStateWithLifecycle()
 
     val lifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(lifecycleOwner) {
@@ -81,6 +84,15 @@ fun GameScreen(
 
     LaunchedEffect(state.isGameOver) {
         if (state.isGameOver) onFinish(state.score)
+    }
+
+    LaunchedEffect(Unit) { audioSettingsViewModel.playGameMusic() }
+    LaunchedEffect(state.isPaused) {
+        if (state.isPaused) {
+            audioSettingsViewModel.pauseMusic()
+        } else {
+            audioSettingsViewModel.resumeMusic()
+        }
     }
 
     val screenWidth = LocalConfiguration.current.screenWidthDp
@@ -193,6 +205,10 @@ fun GameScreen(
         // ---------- PAUSE OVERLAY ----------
         if (state.isPaused) {
             PauseOverlay(
+                audioState = audioState,
+                onToggleMusic = audioSettingsViewModel::toggleMusic,
+                onToggleSound = audioSettingsViewModel::toggleSound,
+                onToggleVibration = audioSettingsViewModel::toggleVibration,
                 onResume = { viewModel.resume() },
                 onRestart = { viewModel.restart() },
                 onQuit = onQuit
