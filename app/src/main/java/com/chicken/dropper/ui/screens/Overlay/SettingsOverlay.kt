@@ -46,10 +46,11 @@ fun SettingsOverlay(
     onDismiss: () -> Unit
 ) {
     val scale = rememberVerticalUiScale()
+    val scrimColor = rememberDelayedScrimColor(targetColor = Color(0xAA000000))
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xAA000000)),
+            .background(scrimColor),
         contentAlignment = Alignment.Center
     ) {
 

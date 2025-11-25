@@ -36,11 +36,12 @@ fun IntroOverlay(
     onStart: () -> Unit,
 ) {
     val scale = rememberVerticalUiScale()
+    val scrimColor = rememberDelayedScrimColor(targetColor = Color(0xB0000000))
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xB0000000)),
+            .background(scrimColor),
         contentAlignment = Alignment.Center
     ) {
 
