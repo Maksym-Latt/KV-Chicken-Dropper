@@ -53,6 +53,11 @@ class MainActivity : ComponentActivity() {
         super.onPause()
     }
 
+    override fun onStop() {
+        audio.pauseMusic()
+        super.onStop()
+    }
+
     private fun hideSystemBars() {
         val controller = WindowInsetsControllerCompat(window, window.decorView)
         controller.systemBarsBehavior =
