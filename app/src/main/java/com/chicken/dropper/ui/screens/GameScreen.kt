@@ -1,6 +1,17 @@
 package com.chicken.dropper.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -8,34 +19,23 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.WindowInsets
@@ -49,9 +49,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.chicken.dropper.R
-import com.chicken.dropper.ui.components.ChickenButtonStyle
 import com.chicken.dropper.ui.components.GradientOutlinedText
-import com.chicken.dropper.ui.components.PrimaryButton
 import com.chicken.dropper.ui.components.SecondaryButton
 import com.chicken.dropper.ui.screens.Overlay.PauseOverlay
 import com.chicken.dropper.ui.viewmodel.AudioSettingsViewModel
@@ -95,8 +93,38 @@ fun GameScreen(
         }
     }
 
-    val screenWidth = LocalConfiguration.current.screenWidthDp
-    val bucketX = (state.bucketX * screenWidth).dp - 48.dp
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp
+    val screenHeight = configuration.screenHeightDp
+    val scaleFactor = remember(screenWidth, screenHeight) {
+        // Use current layout as a baseline while softly adapting to wider or taller screens
+        val widthRatio = screenWidth / 411f
+        val heightRatio = screenHeight / 891f
+        maxOf(0.85f, minOf(widthRatio, heightRatio))
+    }
+    fun scaledDp(value: Float) = (value * scaleFactor).dp
+
+    val bucketX = (state.bucketX * screenWidth).dp - scaledDp(48f)
+
+    val idleBob by rememberInfiniteTransition(label = "chickenIdle").animateFloat(
+        initialValue = -2f,
+        targetValue = 2f,
+        animationSpec = infiniteRepeatable(tween(durationMillis = 1800, easing = LinearEasing), RepeatMode.Reverse),
+        label = "chickenBob"
+    )
+    val chickenDropOffset by animateFloatAsState(
+        targetValue = if (state.isDropping) 6f else 0f,
+        animationSpec = tween(durationMillis = 220, easing = LinearEasing),
+        label = "chickenDrop"
+    )
+    val chickenOffset = scaledDp(idleBob + chickenDropOffset)
+
+    val eggWobble by rememberInfiniteTransition(label = "eggWobble").animateFloat(
+        initialValue = -8f,
+        targetValue = 8f,
+        animationSpec = infiniteRepeatable(tween(durationMillis = 700, easing = LinearEasing), RepeatMode.Reverse),
+        label = "eggTilt"
+    )
 
     Box(
         modifier = Modifier
@@ -119,14 +147,15 @@ fun GameScreen(
         GameTopBar(
             score = state.score,
             lives = state.lives,
-            onPause = { viewModel.togglePause() }
+            onPause = { viewModel.togglePause() },
+            scaleFactor = scaleFactor
         )
 
         // ---------- PLATE + CHICKEN ----------
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 80.dp),
+                .padding(top = scaledDp(80f)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
@@ -140,7 +169,8 @@ fun GameScreen(
                 painter = painterResource(id = chickenRes),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(180.dp)
+                    .size(scaledDp(180f))
+                    .offset(y = chickenOffset)
             )
 
             // ПЛИТА
@@ -149,7 +179,7 @@ fun GameScreen(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
+                    .padding(horizontal = scaledDp(24f)),
                 contentScale = ContentScale.Fit
             )
         }
@@ -158,15 +188,17 @@ fun GameScreen(
 
         // ---------- EGG FALLING ----------
         state.eggY?.let { eggPos ->
-            val eggYOffset = (eggPos * (LocalConfiguration.current.screenHeightDp - 230)).dp
+            val eggYOffset = (eggPos * (screenHeight - 230)).dp
+            val eggRotation = if (state.isDropping) eggWobble else 0f
 
             Image(
                 painter = painterResource(id = R.drawable.egg),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(scaledDp(44f))
                     .align(Alignment.TopCenter)
                     .offset(y = eggYOffset)
+                    .graphicsLayer { rotationZ = eggRotation }
             )
         }
 
@@ -174,30 +206,34 @@ fun GameScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 48.dp),
+                .padding(bottom = scaledDp(48f)),
             contentAlignment = Alignment.BottomStart
         ) {
             Image(
                 painter = painterResource(id = R.drawable.bucket),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(width = 120.dp, height = 100.dp)
+                    .size(width = scaledDp(120f), height = scaledDp(100f))
                     .offset(x = bucketX)
             )
         }
 
         // ---------- BROKEN EGG ----------
-        if (state.brokenEggVisible) {
+        AnimatedVisibility(
+            visible = state.brokenEggVisible,
+            enter = fadeIn(animationSpec = tween(200)) + scaleIn(initialScale = 0.85f),
+            exit = fadeOut(animationSpec = tween(250)) + scaleOut(targetScale = 0.85f)
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 22.dp),
+                    .padding(bottom = scaledDp(22f)),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.egg_broke),
                     contentDescription = null,
-                    modifier = Modifier.size(72.dp)
+                    modifier = Modifier.size(scaledDp(72f))
                 )
             }
         }
@@ -221,12 +257,15 @@ fun GameScreen(
 fun GameTopBar(
     score: Int,
     lives: Int,
-    onPause: () -> Unit
+    onPause: () -> Unit,
+    scaleFactor: Float
 ) {
+    fun scaled(value: Float) = (value * scaleFactor).dp
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = scaled(16f))
             .windowInsetsPadding(WindowInsets.displayCutout),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.Top
@@ -236,8 +275,8 @@ fun GameTopBar(
         SecondaryButton(
             icon = painterResource(id = R.drawable.ic_pause),
             onClick = onPause,
-            buttonSize = 60.dp,
-            iconSize = 32.dp
+            buttonSize = scaled(60f),
+            iconSize = scaled(32f)
         )
 
         // ---- SCORE + HEARTS ----
@@ -248,7 +287,7 @@ fun GameTopBar(
             // --- SCORE ---
             GradientOutlinedText(
                 text = "Score: ${score.toString().padStart(4, '0')}",
-                fontSize = 22.sp,
+                fontSize = 22.sp * scaleFactor,
                 outlineWidth = 7f,
                 fillWidth = false,
                 textAlign = TextAlign.Left,
@@ -260,14 +299,14 @@ fun GameTopBar(
 
             // --- HEARTS ---
             Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(scaled(6f)),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 repeat(lives) {
                     Image(
                         painter = painterResource(id = R.drawable.heart),
                         contentDescription = null,
-                        modifier = Modifier.size(40.dp)
+                        modifier = Modifier.size(scaled(40f))
                     )
                 }
             }
