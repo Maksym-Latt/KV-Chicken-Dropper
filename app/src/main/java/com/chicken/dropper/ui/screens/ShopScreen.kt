@@ -31,8 +31,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -65,6 +68,7 @@ import java.util.Collections.rotate
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import kotlinx.coroutines.delay
 
 @Composable
 fun ShopScreen(
@@ -76,9 +80,17 @@ fun ShopScreen(
     var currentIndex by rememberSaveable { mutableIntStateOf(0) }
     val currentSkin = skins.getOrNull(currentIndex)
     val scale = rememberVerticalUiScale()
+    var showNoMoney by remember { mutableStateOf(false) }
 
     if (skins.isNotEmpty() && currentIndex !in skins.indices) {
         currentIndex = 0
+    }
+
+    LaunchedEffect(showNoMoney) {
+        if (showNoMoney) {
+            delay(1200)
+            showNoMoney = false
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -88,6 +100,42 @@ fun ShopScreen(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
+
+        if (showNoMoney) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 100.dp.scaled(scale)),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color(0xAA000000),
+                    border = BorderStroke(3.dp, Color.Black)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(Color(0xFFFF7D7D), Color(0xFFB12020))
+                                )
+                            )
+                            .padding(horizontal = 24.dp, vertical = 14.dp)
+                    ) {
+                        GradientOutlinedText(
+                            text = "Not enough eggs!",
+                            fontSize = 24.sp.scaled(scale),
+                            outlineWidth = 6f,
+                            outlineColor = Color(0xFF4A0E0E),
+                            fillWidth = false,
+                            gradient = Brush.verticalGradient(
+                                listOf(Color(0xFFFFF38A), Color(0xFFFFC300))
+                            )
+                        )
+                    }
+                }
+            }
+        }
 
         Column(
             modifier = Modifier
@@ -167,11 +215,13 @@ fun ShopScreen(
                     selected = selected,
                     eggs = playerState.eggs,
                     onBuy = { viewModel.onBuySkin(skin) },
-                    onSelect = { viewModel.onSelectSkin(skin.id) }
+                    onSelect = { viewModel.onSelectSkin(skin.id) },
+                    onNotEnoughEggs = { showNoMoney = true }
                 )
 
                 Spacer(modifier = Modifier.height(8.dp.scaled(scale)))
             }
+
             Spacer(modifier = Modifier.weight(1f))
         }
     }
@@ -323,7 +373,8 @@ private fun ShopBottomAction(
     selected: Boolean,
     eggs: Int,
     onBuy: () -> Unit,
-    onSelect: () -> Unit
+    onSelect: () -> Unit,
+    onNotEnoughEggs: () -> Unit
 ) {
     val canBuy = !owned && eggs >= price
 
@@ -346,6 +397,7 @@ private fun ShopBottomAction(
                     selected -> Unit
                     owned -> onSelect()
                     canBuy -> onBuy()
+                    else -> onNotEnoughEggs()
                 }
             },
             style = style,
