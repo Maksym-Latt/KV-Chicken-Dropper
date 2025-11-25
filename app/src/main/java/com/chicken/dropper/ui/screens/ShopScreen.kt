@@ -1,5 +1,11 @@
 package com.chicken.dropper.ui.screens
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,17 +22,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,6 +56,8 @@ import com.chicken.dropper.ui.components.EggCounter
 import com.chicken.dropper.ui.components.GradientOutlinedText
 import com.chicken.dropper.ui.components.PrimaryButton
 import com.chicken.dropper.ui.components.SecondaryButton
+import com.chicken.dropper.ui.theme.rememberScreenScale
+import com.chicken.dropper.ui.theme.scaled
 import com.chicken.dropper.ui.viewmodel.ShopViewModel
 
 
@@ -66,6 +70,17 @@ fun ShopScreen(
     val skins = viewModel.skins
     var currentIndex by rememberSaveable { mutableIntStateOf(0) }
     val currentSkin = skins.getOrNull(currentIndex)
+    val scale = rememberScreenScale()
+    val infiniteTransition = rememberInfiniteTransition(label = "shop_skin")
+    val skinFloat by infiniteTransition.animateFloat(
+        initialValue = -10f * scale,
+        targetValue = 10f * scale,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1500, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "shop_skin_float"
+    )
 
     if (skins.isNotEmpty() && currentIndex !in skins.indices) {
         currentIndex = 0
@@ -82,21 +97,22 @@ fun ShopScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 24.dp),
+                .padding(horizontal = 20.dp.scaled(scale), vertical = 24.dp.scaled(scale)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             TopBar(
                 eggs = playerState.eggs,
-                onBack = onBack
+                onBack = onBack,
+                scale = scale
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp.scaled(scale)))
 
             if (currentSkin != null) {
-                TitleBlock(title1 = currentSkin.titleTop, title2 = currentSkin.titleBottom)
+                TitleBlock(title1 = currentSkin.titleTop, title2 = currentSkin.titleBottom, scale = scale)
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp.scaled(scale)))
 
             Box(
                 modifier = Modifier
@@ -114,7 +130,7 @@ fun ShopScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        ArrowButton(direction = ArrowDirection.Left) {
+                        ArrowButton(direction = ArrowDirection.Left, scale = scale) {
                             currentIndex = (currentIndex - 1 + skins.size) % skins.size
                         }
 
@@ -129,13 +145,14 @@ fun ShopScreen(
                                 painter = painterResource(id = sprite),
                                 contentDescription = skin.name,
                                 modifier = Modifier
-                                    .height(340.dp)
+                                    .height(340.dp.scaled(scale))
                                     .fillMaxWidth(),
+                                    .offset(y = skinFloat.dp),
                                 contentScale = ContentScale.Fit
                             )
                         }
 
-                        ArrowButton(direction = ArrowDirection.Right) {
+                        ArrowButton(direction = ArrowDirection.Right, scale = scale) {
                             currentIndex = (currentIndex + 1) % skins.size
                         }
                     }
@@ -148,7 +165,7 @@ fun ShopScreen(
                 val owned = playerState.ownedSkins.contains(skin.id)
                 val selected = playerState.selectedSkinId == skin.id
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(12.dp.scaled(scale)))
 
                 ShopBottomAction(
                     price = skin.price,
@@ -159,7 +176,7 @@ fun ShopScreen(
                     onSelect = { viewModel.onSelectSkin(skin.id) }
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp.scaled(scale)))
             }
         }
     }
@@ -172,19 +189,22 @@ fun ShopScreen(
 @Composable
 private fun TopBar(
     eggs: Int,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    scale: Float = 1f
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .windowInsetsPadding(WindowInsets.displayCutout)
-            .padding(bottom = 8.dp),
+            .padding(bottom = 8.dp.scaled(scale)),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         SecondaryButton(
             icon = painterResource(id = R.drawable.ic_home),
             onClick = onBack,
+            buttonSize = 60.dp.scaled(scale),
+            iconSize = 32.dp.scaled(scale)
         )
 
         EggCounter(
@@ -199,7 +219,7 @@ private fun TopBar(
 // region TitleBlock
 
 @Composable
-private fun TitleBlock(title1: String, title2: String) {
+private fun TitleBlock(title1: String, title2: String, scale: Float = 1f) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -208,8 +228,8 @@ private fun TitleBlock(title1: String, title2: String) {
         // ---------- CHICKEN ----------
         GradientOutlinedText(
             text = title1,
-            fontSize = 54.sp,
-            outlineWidth = 10f,
+            fontSize = 54.sp * scale,
+            outlineWidth = 10f * scale,
             outlineColor = Color(0xFF551A32),
             gradient = Brush.verticalGradient(
                 listOf(Color(0xFFFF88D0), Color(0xFFCA3CC7))
@@ -223,10 +243,10 @@ private fun TitleBlock(title1: String, title2: String) {
                 listOf(Color(0xFFFFC107), Color(0xFFFFC107))
             ),
             outlineColor = Color(0xFF6A3C00),
-            fontSize = 54.sp,
-            outlineWidth = 10f,
+            fontSize = 54.sp * scale,
+            outlineWidth = 10f * scale,
             modifier = Modifier
-                .offset(y = (-55).dp)
+                .offset(y = (-55).dp.scaled(scale))
         )
     }
 }
@@ -238,7 +258,7 @@ private fun TitleBlock(title1: String, title2: String) {
 private enum class ArrowDirection { Left, Right }
 
 @Composable
-private fun ArrowButton(direction: ArrowDirection, onClick: () -> Unit) {
+private fun ArrowButton(direction: ArrowDirection, onClick: () -> Unit, scale: Float = 1f) {
     val icon = when (direction) {
         ArrowDirection.Left -> Icons.Filled.KeyboardArrowLeft
         ArrowDirection.Right -> Icons.Filled.KeyboardArrowRight
@@ -246,12 +266,12 @@ private fun ArrowButton(direction: ArrowDirection, onClick: () -> Unit) {
 
     Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(24.dp.scaled(scale)),
         color = Color.Transparent,
         border = BorderStroke(2.dp, Color(0xFFB88416)),
         modifier = Modifier
-            .size(width = 46.dp, height = 80.dp)
-            .shadow(8.dp, RoundedCornerShape(24.dp), clip = false)
+            .size(width = 46.dp.scaled(scale), height = 80.dp.scaled(scale))
+            .shadow(8.dp.scaled(scale), RoundedCornerShape(24.dp.scaled(scale)), clip = false)
     ) {
         Box(
             modifier = Modifier
@@ -266,7 +286,7 @@ private fun ArrowButton(direction: ArrowDirection, onClick: () -> Unit) {
                 imageVector = icon,
                 contentDescription = null,
                 tint = Color(0xFF8B4D00),
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(32.dp.scaled(scale))
             )
         }
     }

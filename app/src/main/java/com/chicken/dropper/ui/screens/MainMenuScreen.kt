@@ -1,5 +1,11 @@
 package com.chicken.dropper.ui.screens
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,15 +16,10 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,7 +28,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -39,6 +39,8 @@ import com.chicken.dropper.ui.components.GameTitle
 import com.chicken.dropper.ui.components.PrimaryButton
 import com.chicken.dropper.ui.components.SecondaryButton
 import com.chicken.dropper.ui.screens.Overlay.SettingsOverlay
+import com.chicken.dropper.ui.theme.rememberScreenScale
+import com.chicken.dropper.ui.theme.scaled
 import com.chicken.dropper.ui.viewmodel.AudioSettingsViewModel
 import com.chicken.dropper.ui.viewmodel.MenuViewModel
 @Composable
@@ -51,6 +53,18 @@ fun MainMenuScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val audioState by audioSettingsViewModel.state.collectAsStateWithLifecycle()
     var showSettings by rememberSaveable { mutableStateOf(false) }
+    val scale = rememberScreenScale()
+
+    val infiniteTransition = rememberInfiniteTransition(label = "menu_chicken")
+    val chickenFloat by infiniteTransition.animateFloat(
+        initialValue = -6f * scale,
+        targetValue = 6f * scale,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1400, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "menu_chicken_float"
+    )
 
     LaunchedEffect(Unit) { audioSettingsViewModel.playMenuMusic() }
 
@@ -65,7 +79,7 @@ fun MainMenuScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 24.dp),
+                .padding(horizontal = 20.dp.scaled(scale), vertical = 24.dp.scaled(scale)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // ---------- TOP BAR ----------
@@ -99,7 +113,8 @@ fun MainMenuScreen(
                 ),
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth(0.6f),
+                    .fillMaxWidth(0.64f)
+                    .offset(y = chickenFloat.dp),
                 contentScale = ContentScale.Crop
             )
 
