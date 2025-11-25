@@ -4,9 +4,6 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.media.SoundPool
-import android.os.Build
-import android.os.Vibrator
-import android.os.VibratorManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,14 +28,14 @@ class DefaultAudioController @Inject constructor(
         )
         .build()
 
-    private val effectToName = mapOf(
+    private val effectToResId = mapOf(
         SoundEffect.WIN to "sfx_win",
         SoundEffect.LOSE to "sfx_lose",
         SoundEffect.HIT to "sfx_hit",
         SoundEffect.DROP to "sfx_drop",
         SoundEffect.MISS to "sfx_miss",
         SoundEffect.SWITCH to "sfx_switch",
-    )
+    ).mapValues { (_, name) -> resolveRaw(name) }
 
     private val loadedEffects = mutableMapOf<SoundEffect, Int>()
     private val readySamples = mutableSetOf<Int>()
@@ -52,16 +49,7 @@ class DefaultAudioController @Inject constructor(
 
     private var musicVolume: Float = settingsRepository.getMusicVolume().toVolume()
     private var soundVolume: Float = settingsRepository.getSoundVolume().toVolume()
-    private var vibrationEnabled: Boolean = settingsRepository.isVibrationEnabled()
     private var resumeAfterLifecyclePause: Boolean = false
-
-    private val vibrator: Vibrator? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        val manager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
-        manager?.defaultVibrator
-    } else {
-        @Suppress("DEPRECATION")
-        context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-    }
 
     init {
         soundPool.setOnLoadCompleteListener { pool, sampleId, status ->
@@ -147,10 +135,6 @@ class DefaultAudioController @Inject constructor(
 
     override fun setSoundVolume(percent: Int) {
         soundVolume = percent.toVolume()
-    }
-
-    override fun setVibrationEnabled(enabled: Boolean) {
-        vibrationEnabled = enabled
     }
 
     override fun playGameLose() {

@@ -23,8 +23,7 @@ class AudioSettingsViewModel @Inject constructor(
     private val _state = MutableStateFlow(
         AudioSettingsState(
             isMusicEnabled = defaultMusicVolume > 0,
-            isSoundEnabled = defaultSoundVolume > 0,
-            isVibrationEnabled = settingsRepository.isVibrationEnabled()
+            isSoundEnabled = defaultSoundVolume > 0
         )
     )
     val state: StateFlow<AudioSettingsState> = _state
@@ -54,13 +53,6 @@ class AudioSettingsViewModel @Inject constructor(
         }
     }
 
-    fun toggleVibration() {
-        _state.update { it.copy(isVibrationEnabled = !it.isVibrationEnabled) }
-        audioController.setVibrationEnabled(_state.value.isVibrationEnabled)
-        playSwitchIfSoundEnabled()
-    }
-
-
     fun playMenuMusic() {
         lastMusicDestination = MusicDestination.MENU
         if (_state.value.isMusicEnabled) {
@@ -85,19 +77,19 @@ class AudioSettingsViewModel @Inject constructor(
     }
 
     fun playMiss() {
-        if (_state.value.isSoundEnabled || _state.value.isVibrationEnabled) {
+        if (_state.value.isSoundEnabled) {
             audioController.playMiss()
         }
     }
 
     fun playLose() {
-        if (_state.value.isSoundEnabled || _state.value.isVibrationEnabled) {
+        if (_state.value.isSoundEnabled) {
             audioController.playGameLose()
         }
     }
 
     fun playWin() {
-        if (_state.value.isSoundEnabled || _state.value.isVibrationEnabled) {
+        if (_state.value.isSoundEnabled) {
             audioController.playGameWin()
         }
     }
@@ -115,7 +107,6 @@ class AudioSettingsViewModel @Inject constructor(
     private fun applyAudioSettings() {
         applyMusicSettings()
         applySoundSettings()
-        audioController.setVibrationEnabled(_state.value.isVibrationEnabled)
     }
 
     private fun applyMusicSettings() {
@@ -150,6 +141,5 @@ class AudioSettingsViewModel @Inject constructor(
 
 data class AudioSettingsState(
     val isMusicEnabled: Boolean = true,
-    val isSoundEnabled: Boolean = true,
-    val isVibrationEnabled: Boolean = true
+    val isSoundEnabled: Boolean = true
 )

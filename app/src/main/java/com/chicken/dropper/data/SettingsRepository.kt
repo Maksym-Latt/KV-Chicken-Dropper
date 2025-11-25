@@ -7,5 +7,4 @@ import javax.inject.Singleton
 class SettingsRepository @Inject constructor() {
     fun getMusicVolume(): Int = 80
     fun getSoundVolume(): Int = 80
-    fun isVibrationEnabled(): Boolean = true
 }

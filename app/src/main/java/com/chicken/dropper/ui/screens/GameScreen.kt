@@ -245,7 +245,6 @@ fun GameScreen(
                 audioState = audioState,
                 onToggleMusic = audioSettingsViewModel::toggleMusic,
                 onToggleSound = audioSettingsViewModel::toggleSound,
-                onToggleVibration = audioSettingsViewModel::toggleVibration,
                 onResume = { viewModel.resume() },
                 onRestart = { viewModel.restart() },
                 onQuit = onQuit

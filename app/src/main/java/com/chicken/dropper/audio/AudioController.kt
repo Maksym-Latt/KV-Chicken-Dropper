@@ -9,7 +9,6 @@ interface AudioController {
 
     fun setMusicVolume(percent: Int)
     fun setSoundVolume(percent: Int)
-    fun setVibrationEnabled(enabled: Boolean)
 
     fun playDrop()
     fun playGameLose()
