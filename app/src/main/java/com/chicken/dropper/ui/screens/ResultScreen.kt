@@ -25,9 +25,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.chicken.dropper.R
 import com.chicken.dropper.ui.components.ChickenButtonStyle
-import com.chicken.dropper.ui.components.GameTitle
 import com.chicken.dropper.ui.components.GradientOutlinedText
 import com.chicken.dropper.ui.components.PrimaryButton
+import com.chicken.dropper.ui.components.rememberVerticalUiScale
+import com.chicken.dropper.ui.components.scaled
 
 @Composable
 fun ResultScreen(
@@ -35,6 +36,7 @@ fun ResultScreen(
     onRetry: () -> Unit,
     onMenu: () -> Unit
 ) {
+    val scale = rememberVerticalUiScale()
     Box(modifier = Modifier.fillMaxSize()) {
         // --- BG ---
         Image(
@@ -54,7 +56,7 @@ fun ResultScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 32.dp, vertical = 32.dp),
+                .padding(horizontal = 32.dp.scaled(scale), vertical = 32.dp.scaled(scale)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
@@ -62,7 +64,7 @@ fun ResultScreen(
             // ---------- TITLE ----------
             GradientOutlinedText(
                 text = "Score of eggs:",
-                fontSize = 32.sp,
+                fontSize = 32.sp.scaled(scale),
                 outlineWidth = 10f,
                 textAlign = TextAlign.Center,
                 fillWidth = false,
@@ -74,7 +76,7 @@ fun ResultScreen(
 
             GradientOutlinedText(
                 text = score.toString(),
-                fontSize = 24.sp,
+                fontSize = 24.sp.scaled(scale),
                 outlineWidth = 10f,
                 textAlign = TextAlign.Center,
                 fillWidth = false,
@@ -89,7 +91,7 @@ fun ResultScreen(
                 painter = painterResource(id = R.drawable.chicken_1_drop),
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth(0.6f),
+                    .fillMaxWidth(0.65f),
                 contentScale = ContentScale.Crop
             )
 
@@ -98,7 +100,7 @@ fun ResultScreen(
                 painter = painterResource(id = R.drawable.egg_broke),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(140.dp)
+                    .size(140.dp.scaled(scale))
             )
 
             // ---------- BUTTONS ----------

@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +37,8 @@ import com.chicken.dropper.ui.components.ChickenButtonStyle
 import com.chicken.dropper.ui.components.GameTitle
 import com.chicken.dropper.ui.components.PrimaryButton
 import com.chicken.dropper.ui.components.SecondaryButton
+import com.chicken.dropper.ui.components.rememberVerticalUiScale
+import com.chicken.dropper.ui.components.scaled
 import com.chicken.dropper.ui.screens.Overlay.SettingsOverlay
 import com.chicken.dropper.ui.viewmodel.AudioSettingsViewModel
 import com.chicken.dropper.ui.viewmodel.MenuViewModel
@@ -51,6 +52,7 @@ fun MainMenuScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val audioState by audioSettingsViewModel.state.collectAsStateWithLifecycle()
     var showSettings by rememberSaveable { mutableStateOf(false) }
+    val scale = rememberVerticalUiScale()
 
     LaunchedEffect(Unit) { audioSettingsViewModel.playMenuMusic() }
 
@@ -65,7 +67,7 @@ fun MainMenuScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 24.dp),
+                .padding(horizontal = 20.dp.scaled(scale), vertical = 24.dp.scaled(scale)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // ---------- TOP BAR ----------
@@ -78,7 +80,9 @@ fun MainMenuScreen(
             ) {
                 SecondaryButton(
                     icon = painterResource(id = R.drawable.ic_settings),
-                    onClick = { showSettings = true }
+                    onClick = { showSettings = true },
+                    buttonSize = 60.dp.scaled(scale),
+                    iconSize = 30.dp.scaled(scale)
                 )
             }
 
@@ -99,7 +103,7 @@ fun MainMenuScreen(
                 ),
                 contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth(0.6f),
+                    .fillMaxWidth(0.65f),
                 contentScale = ContentScale.Crop
             )
 

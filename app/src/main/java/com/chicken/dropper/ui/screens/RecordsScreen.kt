@@ -19,9 +19,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.chicken.dropper.R
 import com.chicken.dropper.ui.components.PrimaryButton
+import com.chicken.dropper.ui.components.rememberVerticalUiScale
+import com.chicken.dropper.ui.components.scaled
 
 @Composable
 fun RecordsScreen(bestScore: Int, onBack: () -> Unit) {
+    val scale = rememberVerticalUiScale()
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.bg_menu),
@@ -32,7 +35,7 @@ fun RecordsScreen(bestScore: Int, onBack: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 32.dp, vertical = 42.dp),
+                .padding(horizontal = 32.dp.scaled(scale), vertical = 42.dp.scaled(scale)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -43,8 +46,11 @@ fun RecordsScreen(bestScore: Int, onBack: () -> Unit) {
             )
             Text(
                 text = bestScore.toString(),
-                style = MaterialTheme.typography.displaySmall.copy(fontSize = 52.sp, fontWeight = FontWeight.ExtraBold),
-                modifier = Modifier.padding(vertical = 24.dp)
+                style = MaterialTheme.typography.displaySmall.copy(
+                    fontSize = 52.sp.scaled(scale),
+                    fontWeight = FontWeight.ExtraBold
+                ),
+                modifier = Modifier.padding(vertical = 24.dp.scaled(scale))
             )
             PrimaryButton(text = "Back", onClick = onBack)
         }

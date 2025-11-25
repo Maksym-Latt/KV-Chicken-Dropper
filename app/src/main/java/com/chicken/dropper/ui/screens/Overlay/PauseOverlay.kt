@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.MusicOff
 import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,6 +52,8 @@ import com.chicken.dropper.ui.components.ChickenButtonStyle
 import com.chicken.dropper.ui.components.GradientOutlinedText
 import com.chicken.dropper.ui.components.PrimaryButton
 import com.chicken.dropper.ui.viewmodel.AudioSettingsState
+import com.chicken.dropper.ui.components.rememberVerticalUiScale
+import com.chicken.dropper.ui.components.scaled
 
 @Composable
 fun PauseOverlay(
@@ -63,6 +64,7 @@ fun PauseOverlay(
     onRestart: () -> Unit,
     onQuit: () -> Unit
 ) {
+    val scale = rememberVerticalUiScale()
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -89,18 +91,18 @@ fun PauseOverlay(
                             )
                         )
                     )
-                    .padding(horizontal = 12.dp, vertical = 32.dp)
+                    .padding(horizontal = 12.dp.scaled(scale), vertical = 32.dp.scaled(scale))
             ) {
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                    verticalArrangement = Arrangement.spacedBy(20.dp.scaled(scale))
                 ) {
 
                     // ---------- TITLE ----------
                     GradientOutlinedText(
                         text = "Paused",
-                        fontSize = 40.sp,
+                        fontSize = 40.sp.scaled(scale),
                         outlineWidth = 10f,
                         outlineColor = Color(0xFF551A32),
                         textAlign = TextAlign.Center,
@@ -112,7 +114,7 @@ fun PauseOverlay(
 
                     // ---------- AUDIO TOGGLES ----------
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(14.dp),
+                        horizontalArrangement = Arrangement.spacedBy(14.dp.scaled(scale)),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
@@ -120,14 +122,16 @@ fun PauseOverlay(
                             iconOn = Icons.Default.MusicNote,
                             iconOff = Icons.Default.MusicOff,
                             enabled = audioState.isMusicEnabled,
-                            onClick = onToggleMusic
+                            onClick = onToggleMusic,
+                            scale = scale
                         )
 
                         PauseIconToggle(
                             iconOn = Icons.Default.VolumeUp,
                             iconOff = Icons.Default.VolumeOff,
                             enabled = audioState.isSoundEnabled,
-                            onClick = onToggleSound
+                            onClick = onToggleSound,
+                            scale = scale
                         )
 
                     }
@@ -158,7 +162,8 @@ fun PauseIconToggle(
     iconOn: ImageVector,
     iconOff: ImageVector,
     enabled: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    scale: Float = 1f,
 ) {
     val bg = Brush.verticalGradient(
         if (enabled)
@@ -176,7 +181,7 @@ fun PauseIconToggle(
         shape = RoundedCornerShape(14.dp),
         color = Color.Transparent,
         border = BorderStroke(2.dp, Color.Black),
-        modifier = Modifier.size(54.dp)
+        modifier = Modifier.size(54.dp.scaled(scale))
     ) {
         Box(
             modifier = Modifier.background(bg),
@@ -184,7 +189,7 @@ fun PauseIconToggle(
         ) {
             Box(
                 modifier = Modifier
-                    .size(28.dp)
+                    .size(28.dp.scaled(scale))
                     .drawWithCache {
                         onDrawWithContent {
                             drawContent()
