@@ -117,7 +117,7 @@ class GameViewModel @Inject constructor(
 
         val hit = abs(state.bucketX - state.chickenX) < 0.10f
         if (hit) {
-            val add = if (state.goldenBucket) 5 else 1
+            val add = if (state.goldenBucket) 10 else 1
             val newScore = state.score + add
             val nextHitsLeft = if (hitsToSpeedUp > 1) hitsToSpeedUp - 1 else 5
             val speedBoost = if (hitsToSpeedUp == 1) SPEED_STEP else 0f

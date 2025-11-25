@@ -1,4 +1,4 @@
-package com.chicken.dropper.splashscreen
+package com.chicken.dropper.ui.splashscreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,28 +26,12 @@ internal fun SplashScreen(progress: Float) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFF7AD8FF), Color(0xFFFFF4D9))
-                )
-            ),
-        contentAlignment = Alignment.Center
     ) {
         Image(
             painter = painterResource(id = R.drawable.bg_menu),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
-            alpha = 0.6f
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        listOf(Color(0xAAFFFFFF), Color(0x66FFF4D9))
-                    )
-                )
         )
 
         Column(

@@ -1,4 +1,4 @@
-package com.chicken.dropper.splashscreen
+package com.chicken.dropper.ui.splashscreen
 
 import android.content.Intent
 import android.os.Bundle
