@@ -43,6 +43,7 @@ import com.chicken.dropper.ui.components.GradientOutlinedText
 import com.chicken.dropper.ui.components.SecondaryButton
 import com.chicken.dropper.ui.components.rememberVerticalUiScale
 import com.chicken.dropper.ui.components.scaled
+import com.chicken.dropper.ui.screens.Overlay.IntroOverlay
 import com.chicken.dropper.ui.screens.Overlay.PauseOverlay
 import com.chicken.dropper.ui.viewmodel.AudioSettingsViewModel
 import com.chicken.dropper.ui.viewmodel.GameViewModel
@@ -233,6 +234,12 @@ fun GameScreen(
                 onResume = { viewModel.resume() },
                 onRestart = { viewModel.restart() },
                 onQuit = onQuit
+            )
+        }
+
+        if (state.showIntro) {
+            IntroOverlay(
+                onStart = viewModel::dismissIntro
             )
         }
     }

@@ -36,13 +36,17 @@ class GameViewModel @Inject constructor(
 
     fun dropEgg() {
         val state = _uiState.value
-        if (state.isPaused || state.isGameOver || state.eggY != null) return
+        if (state.isPaused || state.isGameOver || state.eggY != null || state.showIntro) return
         _uiState.value = state.copy(
             brokenEggVisible = false,
             eggY = 0f,
             isDropping = true,
             chickenLookingDown = true
         )
+    }
+
+    fun dismissIntro() {
+        _uiState.value = _uiState.value.copy(showIntro = false)
     }
 
     fun togglePause() {
@@ -56,7 +60,13 @@ class GameViewModel @Inject constructor(
     fun restart() {
         direction = 1f
         hitsToSpeedUp = 5
-        _uiState.value = GameUiState(bucketSpeed = BASE_BUCKET_SPEED)
+        val currentState = _uiState.value
+        _uiState.value = GameUiState(
+            bucketSpeed = BASE_BUCKET_SPEED,
+            selectedSkin = currentState.selectedSkin,
+            eggs = currentState.eggs,
+            showIntro = false
+        )
     }
 
     private fun startLoop() {
@@ -146,7 +156,9 @@ class GameViewModel @Inject constructor(
             }
         }
     }
-}data class GameUiState(
+}
+
+data class GameUiState(
     val score: Int = 0,
     val lives: Int = 3,
     val bucketX: Float = 0.5f,
@@ -160,5 +172,6 @@ class GameViewModel @Inject constructor(
     val chickenX: Float = 0.5f,
     val selectedSkin: ChickenSkin? = null,
     val eggs: Int = 0,
-    val brokenEggVisible: Boolean = false
+    val brokenEggVisible: Boolean = false,
+    val showIntro: Boolean = true
 )
