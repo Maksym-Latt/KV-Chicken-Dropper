@@ -19,7 +19,7 @@ class DefaultAudioController @Inject constructor(
 ) : AudioController {
 
     private enum class MusicChannel { MENU, GAME }
-    private enum class SoundEffect { WIN, LOSE, HIT }
+    private enum class SoundEffect { WIN, LOSE, HIT, DROP, MISS, SWITCH }
 
     private val soundPool: SoundPool = SoundPool.Builder()
         .setMaxStreams(6)
@@ -35,9 +35,11 @@ class DefaultAudioController @Inject constructor(
         SoundEffect.WIN to "sfx_win",
         SoundEffect.LOSE to "sfx_lose",
         SoundEffect.HIT to "sfx_hit",
+        SoundEffect.DROP to "sfx_drop",
+        SoundEffect.MISS to "sfx_miss",
+        SoundEffect.SWITCH to "sfx_switch",
     )
 
-    private val effectToResId = effectToName.mapValues { resolveRaw(it.value) }
     private val loadedEffects = mutableMapOf<SoundEffect, Int>()
     private val readySamples = mutableSetOf<Int>()
     private val pendingPlays = mutableSetOf<Int>()
@@ -82,6 +84,18 @@ class DefaultAudioController @Inject constructor(
     override fun playGameMusic() {
         resumeAfterLifecyclePause = false
         playMusic(MusicChannel.GAME)
+    }
+
+    override fun playDrop() {
+        playEffect(SoundEffect.DROP)
+    }
+
+    override fun playMiss() {
+        playEffect(SoundEffect.MISS)
+    }
+
+    override fun playSwitch() {
+        playEffect(SoundEffect.SWITCH)
     }
 
     override fun stopMusic() {
@@ -141,7 +155,6 @@ class DefaultAudioController @Inject constructor(
 
     override fun playGameLose() {
         playEffect(SoundEffect.LOSE)
-        vibrate(160L)
     }
 
     override fun playCoinPickup() {
@@ -154,7 +167,6 @@ class DefaultAudioController @Inject constructor(
 
     override fun playGameWin() {
         playEffect(SoundEffect.WIN)
-        vibrate(200L)
     }
 
 
@@ -234,8 +246,4 @@ class DefaultAudioController @Inject constructor(
     }
 
     private fun Int.toVolume(): Float = (this.coerceIn(0, 100) / 100f).coerceIn(0f, 1f)
-
-    private fun vibrate(durationMs: Long) {
-
-    }
 }

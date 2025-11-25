@@ -11,8 +11,11 @@ interface AudioController {
     fun setSoundVolume(percent: Int)
     fun setVibrationEnabled(enabled: Boolean)
 
+    fun playDrop()
     fun playGameLose()
     fun playCoinPickup()
     fun playHit()
+    fun playMiss()
+    fun playSwitch()
     fun playGameWin()
 }

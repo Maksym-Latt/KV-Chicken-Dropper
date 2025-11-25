@@ -38,17 +38,28 @@ class AudioSettingsViewModel @Inject constructor(
     fun toggleMusic() {
         _state.update { it.copy(isMusicEnabled = !it.isMusicEnabled) }
         applyMusicSettings()
+        playSwitchIfSoundEnabled()
     }
 
     fun toggleSound() {
-        _state.update { it.copy(isSoundEnabled = !it.isSoundEnabled) }
+        val wasEnabled = _state.value.isSoundEnabled
+        if (wasEnabled) {
+            audioController.playSwitch()
+        }
+        val newState = !wasEnabled
+        _state.update { it.copy(isSoundEnabled = newState) }
         applySoundSettings()
+        if (newState) {
+            audioController.playSwitch()
+        }
     }
 
     fun toggleVibration() {
         _state.update { it.copy(isVibrationEnabled = !it.isVibrationEnabled) }
         audioController.setVibrationEnabled(_state.value.isVibrationEnabled)
+        playSwitchIfSoundEnabled()
     }
+
 
     fun playMenuMusic() {
         lastMusicDestination = MusicDestination.MENU
@@ -61,6 +72,33 @@ class AudioSettingsViewModel @Inject constructor(
         lastMusicDestination = MusicDestination.GAME
         if (_state.value.isMusicEnabled) {
             audioController.playGameMusic()
+        }
+    }
+
+
+    fun playDrop() {
+        if (_state.value.isSoundEnabled) audioController.playDrop()
+    }
+
+    fun playHit() {
+        if (_state.value.isSoundEnabled) audioController.playHit()
+    }
+
+    fun playMiss() {
+        if (_state.value.isSoundEnabled || _state.value.isVibrationEnabled) {
+            audioController.playMiss()
+        }
+    }
+
+    fun playLose() {
+        if (_state.value.isSoundEnabled || _state.value.isVibrationEnabled) {
+            audioController.playGameLose()
+        }
+    }
+
+    fun playWin() {
+        if (_state.value.isSoundEnabled || _state.value.isVibrationEnabled) {
+            audioController.playGameWin()
         }
     }
 
@@ -100,6 +138,12 @@ class AudioSettingsViewModel @Inject constructor(
             MusicDestination.MENU -> audioController.playMenuMusic()
             MusicDestination.GAME -> audioController.playGameMusic()
             null -> Unit
+        }
+    }
+
+    private fun playSwitchIfSoundEnabled() {
+        if (_state.value.isSoundEnabled) {
+            audioController.playSwitch()
         }
     }
 }

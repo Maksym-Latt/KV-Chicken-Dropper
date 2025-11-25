@@ -40,6 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -94,6 +97,31 @@ fun GameScreen(
         } else {
             audioSettingsViewModel.resumeMusic()
         }
+    }
+
+    var lastScore by remember { mutableStateOf(state.score) }
+    var lastLives by remember { mutableStateOf(state.lives) }
+
+    LaunchedEffect(state.isDropping) {
+        if (state.isDropping) audioSettingsViewModel.playDrop()
+    }
+
+    LaunchedEffect(state.score) {
+        if (state.score > lastScore) {
+            audioSettingsViewModel.playHit()
+        }
+        lastScore = state.score
+    }
+
+    LaunchedEffect(state.lives) {
+        if (state.lives < lastLives) {
+            if (state.lives <= 0) {
+                audioSettingsViewModel.playLose()
+            } else {
+                audioSettingsViewModel.playMiss()
+            }
+        }
+        lastLives = state.lives
     }
 
     val screenWidth = LocalConfiguration.current.screenWidthDp
