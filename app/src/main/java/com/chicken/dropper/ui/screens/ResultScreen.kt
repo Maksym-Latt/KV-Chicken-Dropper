@@ -2,6 +2,11 @@ package com.chicken.dropper.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +18,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -39,9 +48,16 @@ fun ResultScreen(
     viewModel: ResultViewModel = hiltViewModel()
 ) {
     val scale = rememberVerticalUiScale()
+    var statsVisible by remember { mutableStateOf(false) }
+    var actionsVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(score) {
         viewModel.rewardScore(score)
+    }
+
+    LaunchedEffect(Unit) {
+        statsVisible = true
+        actionsVisible = true
     }
     Box(modifier = Modifier.fillMaxSize()) {
         // --- BG ---
@@ -67,30 +83,37 @@ fun ResultScreen(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Spacer(modifier = Modifier.weight(1f))
-            // ---------- TITLE ----------
-            GradientOutlinedText(
-                text = "Score of eggs:",
-                fontSize = 32.sp.scaled(scale),
-                outlineWidth = 10f,
-                textAlign = TextAlign.Center,
-                fillWidth = false,
-                outlineColor = Color(0xFF6A3C00),
-                gradient = Brush.verticalGradient(
-                    listOf(Color(0xFFFFF38A), Color(0xFFFFC300))
-                )
-            )
+            AnimatedVisibility(
+                visible = statsVisible,
+                enter = fadeIn() + scaleIn(initialScale = 0.95f),
+                exit = fadeOut() + scaleOut(targetScale = 0.95f)
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    GradientOutlinedText(
+                        text = "Score of eggs:",
+                        fontSize = 32.sp.scaled(scale),
+                        outlineWidth = 10f,
+                        textAlign = TextAlign.Center,
+                        fillWidth = false,
+                        outlineColor = Color(0xFF6A3C00),
+                        gradient = Brush.verticalGradient(
+                            listOf(Color(0xFFFFF38A), Color(0xFFFFC300))
+                        )
+                    )
 
-            GradientOutlinedText(
-                text = score.toString(),
-                fontSize = 24.sp.scaled(scale),
-                outlineWidth = 10f,
-                textAlign = TextAlign.Center,
-                fillWidth = false,
-                outlineColor = Color(0xFF6A3C00),
-                gradient = Brush.verticalGradient(
-                    listOf(Color(0xFFFFD48A), Color(0xFFFF9900))
-                )
-            )
+                    GradientOutlinedText(
+                        text = score.toString(),
+                        fontSize = 24.sp.scaled(scale),
+                        outlineWidth = 10f,
+                        textAlign = TextAlign.Center,
+                        fillWidth = false,
+                        outlineColor = Color(0xFF6A3C00),
+                        gradient = Brush.verticalGradient(
+                            listOf(Color(0xFFFFD48A), Color(0xFFFF9900))
+                        )
+                    )
+                }
+            }
 
             // ---------- CHICKEN ----------
             Image(
@@ -101,34 +124,38 @@ fun ResultScreen(
                 contentScale = ContentScale.Crop
             )
 
-            // ---------- BROKEN EGG ----------
-            Image(
-                painter = painterResource(id = R.drawable.egg_broke),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(140.dp.scaled(scale))
-            )
-
-            // ---------- BUTTONS ----------
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            AnimatedVisibility(
+                visible = actionsVisible,
+                enter = fadeIn() + scaleIn(initialScale = 0.95f),
+                exit = fadeOut() + scaleOut(targetScale = 0.95f)
             ) {
-                PrimaryButton(
-                    text = "Retry",
-                    onClick = onRetry,
-                    style = ChickenButtonStyle.Magenta,
-                    modifier = Modifier.fillMaxWidth(0.65f),
-                    fontSize = 28.sp
-                )
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.egg_broke),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(140.dp.scaled(scale))
+                    )
 
-                PrimaryButton(
-                    text = "MENU",
-                    onClick = onMenu,
-                    style = ChickenButtonStyle.Green,
-                    modifier = Modifier.fillMaxWidth(0.85f)
-                )
+                    PrimaryButton(
+                        text = "Retry",
+                        onClick = onRetry,
+                        style = ChickenButtonStyle.Magenta,
+                        modifier = Modifier.fillMaxWidth(0.65f),
+                        fontSize = 28.sp
+                    )
+
+                    PrimaryButton(
+                        text = "MENU",
+                        onClick = onMenu,
+                        style = ChickenButtonStyle.Green,
+                        modifier = Modifier.fillMaxWidth(0.85f)
+                    )
+                }
             }
             Spacer(modifier = Modifier.weight(1f))
         }

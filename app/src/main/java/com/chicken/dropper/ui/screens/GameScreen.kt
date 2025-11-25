@@ -1,5 +1,10 @@
 package com.chicken.dropper.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -226,7 +231,11 @@ fun GameScreen(
         }
 
         // ---------- PAUSE OVERLAY ----------
-        if (state.isPaused) {
+        AnimatedVisibility(
+            visible = state.isPaused,
+            enter = fadeIn() + scaleIn(initialScale = 0.9f),
+            exit = fadeOut() + scaleOut(targetScale = 0.9f)
+        ) {
             PauseOverlay(
                 audioState = audioState,
                 onToggleMusic = audioSettingsViewModel::toggleMusic,
@@ -237,7 +246,11 @@ fun GameScreen(
             )
         }
 
-        if (state.showIntro) {
+        AnimatedVisibility(
+            visible = state.showIntro,
+            enter = fadeIn() + scaleIn(initialScale = 0.9f),
+            exit = fadeOut() + scaleOut(targetScale = 0.9f)
+        ) {
             IntroOverlay(
                 onStart = viewModel::dismissIntro
             )
