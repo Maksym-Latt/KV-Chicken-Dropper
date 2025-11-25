@@ -1,6 +1,7 @@
 package com.chicken.dropper.ui.screens.Overlay
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,27 +43,35 @@ fun IntroOverlay(
             .background(Color(0xB0000000)),
         contentAlignment = Alignment.Center
     ) {
+
         Surface(
             shape = RoundedCornerShape(26.dp),
             color = Color.Transparent,
-            modifier = Modifier.padding(16.dp),
-            border = BorderStroke(4.dp, Color.Black)
+            border = BorderStroke(4.dp, Color.Black),
+            modifier = Modifier.padding(16.dp)
         ) {
             Box(
                 modifier = Modifier
                     .background(
                         Brush.verticalGradient(
-                            listOf(Color(0xFF4CC1FF), Color(0xFF1C7EB7))
+                            listOf( Color(0xffb6428a),
+                                Color(0xff694e60))
                         )
                     )
-                    .padding(horizontal = 18.dp.scaled(scale), vertical = 28.dp.scaled(scale))
+                    .padding(
+                        horizontal = 18.dp.scaled(scale),
+                        vertical = 28.dp.scaled(scale)
+                    )
             ) {
+
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(18.dp.scaled(scale))
                 ) {
+
+                    // ---------- TITLE ----------
                     GradientOutlinedText(
-                        text = "Как играть?",
+                        text = "How to Play",
                         fontSize = 38.sp.scaled(scale),
                         outlineWidth = 9f,
                         outlineColor = Color(0xFF114B70),
@@ -73,67 +82,72 @@ fun IntroOverlay(
                         )
                     )
 
+
+                    // ---------- STEP 1 ----------
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(12.dp.scaled(scale)),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        androidx.compose.foundation.Image(
+                        Image(
                             painter = painterResource(id = R.drawable.egg),
                             contentDescription = null,
                             modifier = Modifier.size(56.dp.scaled(scale))
                         )
                         Text(
-                            text = "Тапни по экрану, когда ведро под курицей",
+                            text = "Tap the screen to drop the egg.",
                             color = Color.White,
-                            fontSize = 20.sp.scaled(scale),
+                            fontSize = 14.sp.scaled(scale),
                             fontWeight = FontWeight.Bold
                         )
                     }
 
+                    // ---------- STEP 2 ----------
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(12.dp.scaled(scale)),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        androidx.compose.foundation.Image(
+                        Image(
                             painter = painterResource(id = R.drawable.bucket),
                             contentDescription = null,
-                            modifier = Modifier.size(72.dp.scaled(scale))
+                            modifier = Modifier.size(56.dp.scaled(scale))
                         )
                         Text(
-                            text = "Попади яйцом в ведро, промах — минус жизнь",
+                            text = "Catch it with the moving bucket.",
                             color = Color.White,
-                            fontSize = 20.sp.scaled(scale),
+                            fontSize = 14.sp.scaled(scale),
                             fontWeight = FontWeight.Bold
                         )
                     }
 
+                    // ---------- STEP 3 ----------
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(12.dp.scaled(scale)),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        androidx.compose.foundation.Image(
+                        Image(
                             painter = painterResource(id = R.drawable.heart),
                             contentDescription = null,
-                            modifier = Modifier.size(52.dp.scaled(scale))
+                            modifier = Modifier.size(56.dp.scaled(scale))
                         )
                         Text(
-                            text = "Собери максимум очков, пока есть сердечки",
+                            text = "Miss = lose a life. Run out = game over.",
                             color = Color.White,
-                            fontSize = 20.sp.scaled(scale),
+                            fontSize = 14.sp.scaled(scale),
                             fontWeight = FontWeight.Bold
                         )
                     }
 
-                    Spacer(modifier = Modifier.size(4.dp.scaled(scale)))
 
+                    // ---------- BUTTON ----------
                     PrimaryButton(
-                        text = "Понял, погнали!",
+                        text = "Start",
                         onClick = onStart,
-                        modifier = Modifier.fillMaxWidth(0.8f),
-                        fontSize = 24.sp.scaled(scale)
+                        fontSize = 26.sp.scaled(scale),
+                        modifier = Modifier.fillMaxWidth(0.8f)
                     )
                 }
             }
         }
     }
 }
+
