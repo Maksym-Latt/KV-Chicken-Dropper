@@ -2,6 +2,7 @@ package com.chicken.dropper.ui.screens.Overlay
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,9 +23,18 @@ import androidx.compose.ui.unit.dp
 import com.chicken.dropper.R
 import com.chicken.dropper.ui.components.ChickenButtonStyle
 import com.chicken.dropper.ui.components.PrimaryButton
+import com.chicken.dropper.ui.viewmodel.AudioSettingsState
 
 @Composable
-public fun PauseOverlay(onResume: () -> Unit, onRestart: () -> Unit, onQuit: () -> Unit) {
+public fun PauseOverlay(
+    audioState: AudioSettingsState,
+    onToggleMusic: () -> Unit,
+    onToggleSound: () -> Unit,
+    onToggleVibration: () -> Unit,
+    onResume: () -> Unit,
+    onRestart: () -> Unit,
+    onQuit: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -49,9 +59,21 @@ public fun PauseOverlay(onResume: () -> Unit, onRestart: () -> Unit, onQuit: () 
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    PauseIconHolder(icon = R.drawable.ic_music)
-                    PauseIconHolder(icon = R.drawable.ic_sound)
-                    PauseIconHolder(icon = R.drawable.ic_vibration)
+                    AudioToggleButton(
+                        icon = R.drawable.ic_music,
+                        isEnabled = audioState.isMusicEnabled,
+                        onClick = onToggleMusic
+                    )
+                    AudioToggleButton(
+                        icon = R.drawable.ic_sound,
+                        isEnabled = audioState.isSoundEnabled,
+                        onClick = onToggleSound
+                    )
+                    AudioToggleButton(
+                        icon = R.drawable.ic_vibration,
+                        isEnabled = audioState.isVibrationEnabled,
+                        onClick = onToggleVibration
+                    )
                 }
                 PrimaryButton(text = "Continue", onClick = onResume, style = ChickenButtonStyle.Magenta)
                 PrimaryButton(text = "Restart", onClick = onRestart, style = ChickenButtonStyle.Magenta)
@@ -63,11 +85,14 @@ public fun PauseOverlay(onResume: () -> Unit, onRestart: () -> Unit, onQuit: () 
 
 
 @Composable
-private fun PauseIconHolder(icon: Int) {
+fun AudioToggleButton(icon: Int, isEnabled: Boolean, onClick: () -> Unit) {
+    val containerColor = if (isEnabled) Color(0xFFD85BAE) else Color(0xFF5B2B54)
     Surface(
-        modifier = Modifier.size(44.dp),
+        modifier = Modifier
+            .size(44.dp)
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
-        color = Color(0xFFD85BAE)
+        color = containerColor
     ) {
         Box(contentAlignment = Alignment.Center) {
             Image(painter = painterResource(id = icon), contentDescription = null, modifier = Modifier.size(28.dp))

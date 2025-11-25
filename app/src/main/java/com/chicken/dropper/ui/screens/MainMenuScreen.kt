@@ -20,7 +20,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,15 +38,21 @@ import com.chicken.dropper.ui.components.ChickenButtonStyle
 import com.chicken.dropper.ui.components.GameTitle
 import com.chicken.dropper.ui.components.PrimaryButton
 import com.chicken.dropper.ui.components.SecondaryButton
+import com.chicken.dropper.ui.screens.Overlay.SettingsOverlay
+import com.chicken.dropper.ui.viewmodel.AudioSettingsViewModel
 import com.chicken.dropper.ui.viewmodel.MenuViewModel
 @Composable
 fun MainMenuScreen(
     onPlay: () -> Unit,
     onShop: () -> Unit,
-    onSettings: () -> Unit,
+    audioSettingsViewModel: AudioSettingsViewModel,
     viewModel: MenuViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val audioState by audioSettingsViewModel.state.collectAsStateWithLifecycle()
+    var showSettings by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) { audioSettingsViewModel.playMenuMusic() }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -68,7 +78,7 @@ fun MainMenuScreen(
             ) {
                 SecondaryButton(
                     icon = painterResource(id = R.drawable.ic_settings),
-                    onClick = onSettings
+                    onClick = { showSettings = true }
                 )
             }
 
@@ -119,6 +129,15 @@ fun MainMenuScreen(
 
             // ---------- SPACE AFTER BUTTONS ----------
             Spacer(modifier = Modifier.weight(1f))
+        }
+
+        if (showSettings) {
+            SettingsOverlay(
+                state = audioState,
+                onToggleMusic = audioSettingsViewModel::toggleMusic,
+                onToggleSound = audioSettingsViewModel::toggleSound,
+                onDismiss = { showSettings = false }
+            )
         }
     }
 }
