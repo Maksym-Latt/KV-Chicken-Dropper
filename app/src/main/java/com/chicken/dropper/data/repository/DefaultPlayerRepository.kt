@@ -33,7 +33,7 @@ class DefaultPlayerRepository @Inject constructor(
             titleTop = "CHICKEN",
             titleBottom = "COOKER",
             description = "Kitchen Fury",
-            price = 1500,
+            price = 500,
             eggSprite = R.drawable.chicken_2_egg,
             dropSprite = R.drawable.chicken_2_drop
         ),

@@ -34,7 +34,7 @@ class PlayerPreferencesDataSource @Inject constructor(
 
     val snapshot: Flow<Snapshot> = dataStore.data.map { prefs ->
         Snapshot(
-            eggs = prefs[eggsKey] ?: 2000,
+            eggs = prefs[eggsKey] ?: 0,
             selectedSkinId = prefs[selectedSkinKey] ?: "classic",
             ownedSkins = prefs[ownedSkinsKey] ?: setOf("classic")
         )

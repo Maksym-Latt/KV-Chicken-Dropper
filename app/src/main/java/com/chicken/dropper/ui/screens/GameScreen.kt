@@ -24,6 +24,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -139,24 +141,6 @@ fun GameScreen(
             scale = scale
         )
 
-        if (state.comboStreak >= 3) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 56.dp.scaled(scale)),
-                contentAlignment = Alignment.Center
-            ) {
-                GradientOutlinedText(
-                    text = "Комбо x${state.comboStreak}",
-                    fontSize = 26.sp.scaled(scale),
-                    outlineWidth = 8f,
-                    gradient = Brush.horizontalGradient(
-                        listOf(Color(0xFFFFF176), Color(0xFFFFD54F))
-                    )
-                )
-            }
-        }
-
         // ---------- PLATE + CHICKEN ----------
         Column(
             modifier = Modifier
@@ -219,15 +203,37 @@ fun GameScreen(
                 .padding(bottom = 48.dp.scaled(scale)),
             contentAlignment = Alignment.BottomStart
         ) {
+            val bucketRes = if (state.goldenBucket)
+                R.drawable.bucket_gold
+            else
+                R.drawable.bucket
+
+            if (state.comboStreak >= 2) {
+                GradientOutlinedText(
+                    text = "x${state.comboStreak}",
+                    fontSize = 34.sp.scaled(scale),
+                    outlineWidth = 10f,
+                    outlineColor = Color(0xFF000000),
+                    gradient = Brush.verticalGradient(
+                        listOf(Color(0xFFFFF176), Color(0xFFFFC107))
+                    ),
+                    fillWidth = false,
+                    modifier = Modifier
+                        .offset(
+                            x = bucketX + bucketWidth / 2 - 20.dp.scaled(scale),
+                            y = (-bucketHeight)
+                        )
+                )
+            }
+
+
             Image(
-                painter = painterResource(id = R.drawable.bucket),
+                painter = painterResource(id = bucketRes),
                 contentDescription = null,
                 modifier = Modifier
                     .size(width = bucketWidth, height = bucketHeight)
                     .offset(x = bucketX),
-                colorFilter = if (state.goldenBucket) ColorFilter.tint(
-                    Color(0xFFFFD54F).copy(alpha = 0.85f)
-                ) else null
+                contentScale = ContentScale.Fit
             )
         }
 
