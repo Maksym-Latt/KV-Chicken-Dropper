@@ -12,18 +12,18 @@ import kotlinx.coroutines.flow.update
 @HiltViewModel
 class AudioSettingsViewModel @Inject constructor(
     private val audioController: AudioController,
-    settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     private enum class MusicDestination { MENU, GAME }
 
-    private val defaultMusicVolume = settingsRepository.getMusicVolume().coerceIn(0, 100)
-    private val defaultSoundVolume = settingsRepository.getSoundVolume().coerceIn(0, 100)
+    private var musicVolume = settingsRepository.getMusicVolume().coerceIn(0, 100)
+    private var soundVolume = settingsRepository.getSoundVolume().coerceIn(0, 100)
 
     private val _state = MutableStateFlow(
         AudioSettingsState(
-            isMusicEnabled = defaultMusicVolume > 0,
-            isSoundEnabled = defaultSoundVolume > 0
+            isMusicEnabled = musicVolume > 0,
+            isSoundEnabled = soundVolume > 0
         )
     )
     val state: StateFlow<AudioSettingsState> = _state
@@ -36,6 +36,8 @@ class AudioSettingsViewModel @Inject constructor(
 
     fun toggleMusic() {
         _state.update { it.copy(isMusicEnabled = !it.isMusicEnabled) }
+        musicVolume = if (_state.value.isMusicEnabled) DEFAULT_VOLUME else 0
+        settingsRepository.setMusicVolume(musicVolume)
         applyMusicSettings()
         playSwitchIfSoundEnabled()
     }
@@ -47,6 +49,8 @@ class AudioSettingsViewModel @Inject constructor(
         }
         val newState = !wasEnabled
         _state.update { it.copy(isSoundEnabled = newState) }
+        soundVolume = if (newState) DEFAULT_VOLUME else 0
+        settingsRepository.setSoundVolume(soundVolume)
         applySoundSettings()
         if (newState) {
             audioController.playSwitch()
@@ -110,9 +114,8 @@ class AudioSettingsViewModel @Inject constructor(
     }
 
     private fun applyMusicSettings() {
-        val volume = if (_state.value.isMusicEnabled) defaultMusicVolume else 0
-        audioController.setMusicVolume(volume)
-        if (_state.value.isMusicEnabled) {
+        audioController.setMusicVolume(musicVolume)
+        if (_state.value.isMusicEnabled && musicVolume > 0) {
             playLastRequestedMusic()
         } else {
             audioController.pauseMusic()
@@ -120,8 +123,7 @@ class AudioSettingsViewModel @Inject constructor(
     }
 
     private fun applySoundSettings() {
-        val volume = if (_state.value.isSoundEnabled) defaultSoundVolume else 0
-        audioController.setSoundVolume(volume)
+        audioController.setSoundVolume(soundVolume)
     }
 
     private fun playLastRequestedMusic() {
@@ -136,6 +138,10 @@ class AudioSettingsViewModel @Inject constructor(
         if (_state.value.isSoundEnabled) {
             audioController.playSwitch()
         }
+    }
+
+    private companion object {
+        const val DEFAULT_VOLUME = 80
     }
 }
 
