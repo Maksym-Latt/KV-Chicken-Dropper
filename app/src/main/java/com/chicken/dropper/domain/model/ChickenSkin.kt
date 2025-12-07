@@ -1,0 +1,12 @@
+package com.chicken.dropper.domain.model
+
+data class ChickenSkin(
+    val id: String,
+    val name: String,
+    val titleTop: String,
+    val titleBottom: String,
+    val description: String,
+    val price: Int,
+    val eggSprite: Int,
+    val dropSprite: Int
+)
